@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.VacChildInfoMapper">
+
+    
+	<sql id="vacChildInfoColumns">
+		a.id AS "id",
+		a.childcode AS "childcode",
+		a.cardcode AS "cardcode",
+		a.birthcode AS "birthcode",
+		a.childname AS "childname",
+		a.guardianname AS "guardianname",
+		a.guardianrelation AS "guardianrelation",
+		a.guardianmobile AS "guardianmobile",
+		a.createdate AS "createdate",
+		a.userid AS "userid",
+		b.birthday AS "birthday"
+	</sql>
+	
+	<sql id="vacChildInfoJoins">
+	LEFT JOIN BS_CHILD_BASEINFO b ON b.childcode = a.childcode
+	</sql>
+    
+	<select id="get" resultType="VacChildInfo">
+		SELECT 
+			<include refid="vacChildInfoColumns"/>
+		FROM vac_child_info a
+		<include refid="vacChildInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacChildInfo">
+		SELECT 
+			<include refid="vacChildInfoColumns"/>
+		FROM vac_child_info a
+		<include refid="vacChildInfoJoins"/>
+		<where>
+			
+			<if test="childcode != null and childcode != ''">
+				AND a.childcode LIKE '%'||#{childcode}||'%'
+			</if>
+			<if test="cardcode != null and cardcode != ''">
+				AND a.cardcode LIKE '%'||#{cardcode}||'%'
+			</if>
+			<if test="birthcode != null and birthcode != ''">
+				AND a.birthcode LIKE '%'||#{birthcode}||'%'
+			</if>
+			<if test="childname != null and childname != ''">
+				AND a.childname LIKE '%'||#{childname}||'%'
+			</if>
+			<if test="guardianname != null and guardianname != ''">
+				AND a.guardianname LIKE '%'||#{guardianname}||'%'
+			</if>
+			<if test="guardianmobile != null and guardianmobile != ''">
+				AND a.guardianmobile LIKE '%'||#{guardianmobile}||'%'
+			</if>
+			<if test="userid != null and userid != ''">
+				AND a.userid = #{userid}
+			</if>
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY #{orderBy}
+		</if>
+	</select>
+	
+	
+	<insert id="insert">
+		 <selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		 </selectKey> 
+		INSERT INTO vac_child_info(
+			id,
+			childcode,
+			cardcode,
+			birthcode,
+			childname,
+			guardianname,
+			guardianrelation,
+			guardianmobile,
+			createdate,
+			userid,
+			birthday
+		) VALUES (
+			#{id},
+			#{childcode},
+			#{cardcode},
+			#{birthcode},
+			#{childname},
+			#{guardianname},
+			#{guardianrelation},
+			#{guardianmobile},
+			sysdate,
+			#{userid},
+			#{birthday}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_child_info SET 	
+			childcode = #{childcode},
+			cardcode = #{cardcode},
+			birthcode = #{birthcode},
+			childname = #{childname},
+			guardianname = #{guardianname},
+			guardianrelation = #{guardianrelation},
+			guardianmobile = #{guardianmobile},
+			userid = #{userid},
+			birthday = #{birthday}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM vac_child_info
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findVacChildRemindList" resultType="VacChildRemind">
+		SELECT a.*,
+		a.REMIND_VACC AS "vaccname",b.childname
+		FROM VAC_CHILD_REMIND a
+		LEFT JOIN VAC_CHILD_INFO b ON b.childcode = a.childcode
+		<where>
+
+			<if test="userid != null and userid != ''">
+				AND b.userid = #{userid}
+			</if>
+			<if test="childcode != null and childcode != ''">
+				AND a.CHILDCODE = #{childcode}
+			</if>
+			AND  TRUNC (A .remind_date, 'dd')  &lt; TRUNC (SYSDATE + 7, 'dd')
+			AND A.status='0'AND A.DEL_FLAG='0'
+		</where>
+		ORDER BY a.create_date asc,a.remind_date asc
+	</select>
+
+    <select id="findReservaTionList" resultType="VacChildRemind">
+        SELECT a.*,
+        c.name AS "vaccname",
+        b.childname
+        FROM VAC_CHILD_REMIND a
+        LEFT JOIN VAC_CHILD_INFO b ON b.childcode = a.childcode
+        LEFT JOIN BS_MANAGE_VACCINE c ON c.id = A.VACC_ID
+        <where>
+            <if test="userid != null and userid != ''">
+                AND b.userid = #{userid}
+            </if>
+            AND TRUNC (A .remind_date, 'dd') BETWEEN TRUNC (SYSDATE - 3, 'dd')
+            AND TRUNC (SYSDATE + 7, 'dd')
+			AND A.status='0'AND A.DEL_FLAG='0'
+        </where>
+        ORDER BY a.create_date asc,a.remind_date asc
+    </select>
+
+
+	<select id="findVacChildNid" resultType="java.lang.String">
+		SELECT 
+			m_name
+		FROM BS_MANAGE_VACCINE_MODEL
+		<where>
+			<if test="nid != null and nid != ''">
+				AND m_num = substr(#{nid},0,2)
+			</if>
+			<if test="office != null and office != ''">
+				AND localcode = #{office}
+			</if>
+			AND rownum = 1
+		</where>
+	</select>
+
+	<select id="findVacChildRemind" resultType="VacChildRemind">
+		SELECT 	a.* 	FROM VAC_CHILD_REMIND a
+		<where>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="localcode != null and localcode != ''">
+				AND a.localcode = #{localcode}
+			</if>
+			AND rownum = 1
+		</where>
+	</select>
+	
+	<select id="findVacChildRemindById" resultType="VacChildRemind">
+		SELECT 
+			 s.vid AS "vid",
+			 s.id AS "sid",
+			 s.signature AS "signature",
+			 s.stype AS "stype",
+			 s.CHILDCODE
+		FROM 
+			VAC_CHILD_SIGN s
+		WHERE
+			s.vid = #{id}
+        <!-- 	left join VAC_CHILD_REMIND t on t.id = s.VID AND s.office = #{localcode} -->
+<!-- 			AND s.remind_group = substr(#{vaccId},0,2) -->
+	</select>
+
+
+    <select id="findRemindById" resultType="VacChildRemind">
+        SELECT
+        v.*,t."NAME" AS localname
+        FROM
+        VAC_CHILD_REMIND v LEFT JOIN SYS_VACC_DEPARTMENT T ON T.code=v.LOCALCODE
+		<where>
+            <if test="id != null and id != ''">
+                AND v.id = #{id}
+            </if>
+            <if test="localcode != null and localcode != ''">
+                AND v.localcode = #{localcode}
+            </if>
+            <if test="childcode != null and childcode != ''">
+                AND v.childcode = #{childcode}
+            </if>
+            <if test="remindDate != null">
+                AND to_char (v.remind_date, 'YYYY-MM-DD')=#{remindDate}
+            </if>
+			<if test="selectDate != null">
+				AND to_char (v.select_date, 'YYYY-MM-DD')=to_char (#{selectDate}, 'YYYY-MM-DD')
+			</if>
+			AND v.status='0'AND v.DEL_FLAG='0'
+        </where>
+    </select>
+    
+    <select id="findByTime" resultType="SimpleModel">
+      SELECT T1."LABEL" AS "str1" ,"NVL" (T2.PEOPLENUMBER, '0') AS "str2"
+           FROM 
+		(SELECT "VALUE", "LABEL" FROM SYS_DICT WHERE "TYPE" = 'select_time') t1
+			LEFT JOIN ( SELECT "NVL" (select_time, 'a') "SELECT_TIME", COUNT (*) AS peopleNumber  FROM vac_child_remind
+				where SELECT_DATE = #{selectDate}and localcode = #{localcode} AND STATUS='0'
+				 GROUP BY select_time   
+			) t2 ON T1."VALUE" = T2.SELECT_TIME ORDER BY  t1."VALUE"
+     </select>
+
+	<select id="findByNum" resultType="java.lang.Integer">
+			SELECT 	COUNT (*) AS num	FROM	vac_child_remind
+				WHERE	SELECT_DATE = #{selectDate} and localcode = #{localcode} AND SELECT_TIME = #{selectTime}	AND STATUS = '0'
+	</select>
+
+    <update id="updateByTime">
+        UPDATE vac_child_remind SET
+            SELECT_DATE = #{selectDate},
+            SELECT_TIME= #{selectTime}
+        WHERE id = #{id}
+    </update>
+
+	<insert id="insertSignature">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		 </selectKey> 
+   		 INSERT INTO VAC_CHILD_SIGN (
+   		 	"ID",
+   		 	"SIGNATURE",
+   		 	"STYPE",
+   		 	"VID",
+   		 	"CHILDCODE",
+   		 	"REMIND_DATE",
+   		 	"OFFICE",
+   		 	"REMIND_GROUP"
+   		 )VALUES(
+   		 	#{id},
+   		 	#{signature},
+   		 	#{stype},
+   		 	#{vid},
+   		 	#{childcode},
+   		 	#{remindDate},
+   		 	#{localcode},
+   		 	substr(#{vaccId},0,2)
+   		 )
+	</insert>
+	
+	<update id="updateSign">
+		UPDATE VAC_CHILD_REMIND SET
+		"SIGN" = #{sign}
+		WHERE "ID" = #{vid}
+	</update>
+
+	<select id="findChildAppList" resultType="VacChildRemind">
+		SELECT a.*,
+		a.REMIND_VACC AS "vaccname",b.childname
+		FROM VAC_CHILD_REMIND a
+		LEFT JOIN VAC_CHILD_APPINFO b ON b.childcode = a.childcode
+		<where>
+			<if test="phone != null and phone != ''">
+				AND b.phone = #{phone}
+			</if>
+			<if test="childcode != null and childcode != ''">
+				AND a.CHILDCODE = #{childcode}
+			</if>
+			<!-- AND  TRUNC (A .remind_date, 'dd')  &lt; TRUNC (SYSDATE + 7, 'dd') -->
+			AND A.status='0'AND A.DEL_FLAG='0'
+		</where>
+		ORDER BY a.create_date asc,a.remind_date asc
+	</select>
+
+
+	<select id="findAppUserList" resultType="ChildAppinfo">
+		SELECT
+			a.id AS "id",
+			a.childcode AS "childcode",
+			a.birthday AS "birthday",
+			a.childname AS "childname",
+			a.guardianname AS "guardianname",
+			a.guardianrelation AS "guardianrelation",
+			a.phone AS "phone",
+			a.create_date AS "createDate",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks"
+		FROM VAC_CHILD_APPINFO a
+		<where>
+			<if test="childcode != null and childcode != ''">
+				AND a.childcode =#{childcode}
+			</if>
+			<if test="guardianmobile != null and guardianmobile != ''">
+				AND a.phone=#{guardianmobile}
+			</if>
+		</where>
+	</select>
+
+
+
+	<insert id="insertAppUser">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT sys_guid() FROM DUAL
+		</selectKey>
+		INSERT INTO VAC_CHILD_APPINFO(
+		id,
+		childcode,
+		childname,
+		birthday,
+		guardianname,
+		guardianrelation,
+		phone,
+		create_date
+		) VALUES (
+		#{id},
+		#{childcode},
+		#{childname},
+		#{birthday},
+		#{guardianname},
+		#{guardianrelation},
+		#{guardianmobile},
+		sysdate
+		)
+	</insert>
+
+	<update id="updatePayStatus">
+		UPDATE VAC_CHILD_REMIND SET
+		"PAY_STATUS" = #{payStatus}
+		WHERE "ID" = #{id}
+	</update>
+
+	<!-- 查询预约日期+接种单位 edit by wangnan 2018-2-24 -->
+ 	<select id="findRemindInfoById" resultType="java.util.Map">
+       	SELECT
+       		v.LOCALCODE AS LOCALCODE,
+ 			T .NAME AS LOCALNAME,
+			to_char(v.SELECT_DATE,'yyyy-mm-dd')  AS SELECT_DATE,
+			v.SELECT_TIME AS SELECT_TIME,
+			to_char(v.REMIND_DATE,'yyyy-mm-dd')  AS REMIND_DATE 
+	  	FROM
+			VAC_CHILD_REMIND v
+			INNER JOIN SYS_VACC_DEPARTMENT T ON T .code = v.LOCALCODE
+	 	WHERE
+			v.ID = #{id}
+    </select>
+    
+
+</mapper>

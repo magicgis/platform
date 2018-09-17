@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.VacKnowledgeListMapper">
+
+    
+	<sql id="vacKnowledgeListColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a."DESC" AS "desc",
+		a.infoid AS "infoid",
+		a.img AS "img"
+	</sql>
+	
+	<sql id="vacKnowledgeListJoins">
+	</sql>
+    
+	<select id="get" resultType="VacKnowledgeList">
+		SELECT 
+			<include refid="vacKnowledgeListColumns"/>
+		FROM VAC_KNOWLEDGE_LIST a
+		<include refid="vacKnowledgeListJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<insert id="insert">
+		INSERT INTO VAC_KNOWLEDGE_LIST(
+			id,
+			title,
+			dose,
+			desc,
+			infoid,
+			time
+		) VALUES (
+			#{id},
+			#{title},
+			#{dose},
+			#{desc},
+			#{infoid},
+			#{time}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE VAC_KNOWLEDGE_LIST SET 	
+			title = #{title},
+			dose = #{dose},
+			desc = #{desc},
+			infoid = #{infoid},
+			time = #{time}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM VAC_KNOWLEDGE_LIST
+		WHERE id = #{id}
+	</update>
+
+
+
+	<select id="findList" resultType="VacKnowledgeList">
+		SELECT
+		<include refid="vacKnowledgeListColumns"/>
+		FROM VAC_KNOWLEDGE_LIST a
+		<include refid="vacKnowledgeListJoins"/>
+			ORDER BY id
+
+	</select>
+
+	
+	<!-- 查询疫苗知识列表 edit by wangnan 2018-2-9 -->
+	<select id="findKnowList" resultType="java.util.Map">
+		SELECT ID,TITLE,IMG 
+		FROM VAC_KNOWLEDGE_LIST 
+		ORDER BY ID
+
+	</select>
+	
+	<!-- 查询疫苗知识列表 edit by wangnan 2018-2-9 -->
+	<select id="getKnowDetail" resultType="java.lang.String">
+		SELECT BEFORE||AFTER 
+		FROM VAC_KNOWLEDGE_INFO WHERE ID= #{ID}
+
+	</select>
+
+	
+</mapper>

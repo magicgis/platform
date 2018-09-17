@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.BsMapper">
+
+	<sql id="vaccList">
+			select t.*,nvl(bmp.s_num,0) as "stock" , t.vaccgroup as "GROUP" 
+			from BS_MANAGE_VACCINENUM t 
+			left join (
+					select substr(tt.vaccineid, 0, 2) as vacc_group,  sum(tt.storenum) as s_num  
+					from bs_manage_product tt where tt.DEL_FLAG = 0 AND tt."LOCALCODE" = #{localCode}
+					group by substr(tt.vaccineid, 0, 2)
+				) bmp on bmp.vacc_group =  t."VACCGROUP"
+			where t."STATUS" &lt;&gt; '9' 
+			AND t."LOCALCODE" = #{localCode}
+			<if test="vacccease != null and vacccease != ''"> 
+				and t.id not in(${vacccease})
+				<if test="vacccease.indexOf('\'50') &gt; -1 ">
+					 and t.PENTREP &lt;&gt; 1 
+				</if>
+				<if test="vacccease.indexOf('\'03') &gt; -1 ">
+					 and t.PENTREP &lt;&gt; 2 
+				</if>
+			</if>
+	</sql>
+	
+	<sql id="vaccList1">
+			select T.NAME AS VACCNAME,
+				T.PIN AS DOGSE,
+				T.MOUAGE AS AGE
+			from BS_MANAGE_VACCINENUM t 
+			left join (
+					select substr(tt.vaccineid, 0, 2) as vacc_group,  sum(tt.storenum) as s_num  
+					from bs_manage_product tt where tt.DEL_FLAG = 0 AND tt."LOCALCODE" = #{localCode}
+					group by substr(tt.vaccineid, 0, 2)
+				) bmp on bmp.vacc_group =  t."VACCGROUP"
+			where t."STATUS" &lt;&gt; '9' 
+			AND t."LOCALCODE" = #{localCode}
+			<if test="vacccease != null and vacccease != ''"> 
+				and t.id not in(${vacccease})
+				<if test="vacccease.indexOf('\'50') &gt; -1 ">
+					 and t.PENTREP &lt;&gt; 1 
+				</if>
+				<if test="vacccease.indexOf('\'03') &gt; -1 ">
+					 and t.PENTREP &lt;&gt; 2 
+				</if>
+			</if>
+	</sql>
+	
+	
+	<sql id="productCol">
+			t.id,
+			t.vaccineid,
+			t.batchno,
+			t.dosage,
+			t.manufacturer,
+			t.isforeign,
+			t.storenum,
+			t.sellprice,
+			t.isshow,
+			t."VACC_NAME" "vaccName",
+			t."VACC_EXP_DATE" "vaccExpDate",
+			t.vacsiteno,
+			t.codeall
+	</sql>
+
+	<!-- 根据儿童id查询 儿童档案信息 -->
+	<select id="getBsChildBaseInfoByCode" resultType="BsChildBaseInfo">
+		SELECT 
+			t.*,n."NAME" "nationName"
+		FROM BS_CHILD_BASEINFO t LEFT JOIN BS_NATION n ON n."CODE"=t."NATION"
+		WHERE t.CHILDCODE = #{code}
+	</select>
+
+	<select id="getBsChildBaseInfoById" resultType="BsChildBaseInfo">
+		SELECT 
+			t.*,n."NAME" "nationName"
+		FROM BS_CHILD_BASEINFO t LEFT JOIN BS_NATION n ON n."CODE"=t."NATION"
+		WHERE t."ID" = #{id}
+	</select>
+	
+	<select id="getBsChildBaseInfoList" resultType="BsChildBaseInfo">
+		SELECT t.* 
+		FROM BS_CHILD_BASEINFO t 
+		<where>
+			<if test="birthday != null">
+				AND t."BIRTHDAY" = #{birthday}
+			</if>
+			<if test="guardianidentificationnumber != null">
+				AND t."GUARDIANIDENTIFICATIONNUMBER" = #{guardianidentificationnumber}
+			</if>
+			<if test="childname != null">
+				AND t."CHILDNAME" = #{childname}
+			</if>						
+			<if test="tempid != null and tempid != ''">
+				AND t."TEMPID" = #{tempid}
+			</if>						
+		</where>
+	</select>
+    
+    <!-- 获取儿童已接种过的计划的id -->
+    <select id="getFinishNum" resultType="java.lang.String">
+    	SELECT
+			NUM."ID"
+		FROM
+			BS_CHILD_VACCINATERECORD bcv
+		JOIN BS_MANAGE_VACCINENUM num ON BCV."NID" = NUM."ID" and BCV."LOCALCODE" = NUM."LOCALCODE"
+		WHERE
+			BCV.CHILDID = #{id} AND bcv.status &lt;&gt; '9' 
+    </select>
+    
+    <!-- 获取儿童已接种过的计划的id -->
+    <select id="getFinishNumAble" resultType="java.lang.String">
+    	SELECT
+			NUM."ID"
+		FROM
+			BS_CHILD_VACCINATERECORD bcv
+		JOIN BS_MANAGE_VACCINENUM num ON BCV."NID" = NUM."ID" and BCV."LOCALCODE" = NUM."LOCALCODE"
+		WHERE
+			BCV.CHILDID = #{id} AND bcv.status = '1'
+    </select>
+    
+    <!-- 模型计算计划接种 -->
+   	<select id="getVaccList" resultType="BsVaccNum">
+		<include refid="vaccList"/>
+		<if test="isfree != null and isfree != ''">
+			AND t."TYPE" = '1'
+		</if>
+		AND t."MOUAGE" &lt;= #{monage} 
+		
+		order by t.mouage,t.weight,t.pin
+	</select>
+	
+	<!-- 模型计算未接种疫苗 -->
+   	<select id="getUnfinishedRecord" resultType="BsVaccNum">
+		<include refid="vaccList"/>
+		 order by SUBSTR (T ."ID", 0, 2),t.pin
+	</select>
+	
+	<select id="getBsProduct" resultType="BsProduct">
+		SELECT <include refid="productCol"></include>
+		FROM BS_MANAGE_PRODUCT t
+		WHERE "ID" = #{pid}
+	</select>
+	
+	<select id="findAreaByPid" resultType="Area">
+		SELECT ID , PARENT_ID "pid", NAME "name"
+		FROM SYS_AREA
+		WHERE PARENT_ID = #{value} ORDER BY "ID"
+	</select>
+	
+	<select id="findAreaById" resultType="Area">
+		SELECT ID , PARENT_ID "pid", NAME "name"
+		FROM SYS_AREA
+		WHERE "ID" = #{value}
+	</select>
+	
+	
+	<!-- 根据儿童id查询未完成接种记录 -->
+	<select id="findRecordList" resultType="BsRecord">
+		select 
+			t."ID",
+			t."CHILDID",
+			t."VACCINEID",
+			t."NID" "nid",
+			t."STATUS",
+			t."PRODUCTID" "pid",
+			t."VACC_BIGNAME" "allname",
+			t."SOURCE" "source"
+		from BS_CHILD_VACCINATERECORD t LEFT JOIN BS_CHILD_BASEINFO a ON t.CHILDID = a.id
+		<where>
+			<if test="childid != null and childid != ''">
+				 and t.CHILDID = #{childid}
+			</if>
+			<if test="status != null and status != ''">
+				 AND t.status = #{status} 
+			</if>
+			<if test="childcode != null and childcode != ''">
+				 AND a.childcode = #{childcode} 
+			</if>
+			<if test="source != null and source != ''">
+				 AND t."SOURCE" = #{source} 
+			</if>
+		</where>
+		<if test="orderby != null and orderby != ''">
+			ORDER BY ${orderby}
+		</if>
+	</select>
+	
+	
+	<!-- 插入儿童集中记录信息 -->
+	<insert id="insertRecord">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		 </selectKey> 
+   		 INSERT INTO BS_CHILD_VACCINATERECORD (
+   		 	"ID",
+   		 	"CHILDID",
+   		 	"VACCINEID",
+   		 	"NID",
+   		 	"STATUS",
+   		 	"PRODUCTID",
+   		 	"VACC_BIGNAME"
+   		 )VALUES(
+   		 	#{id},
+   		 	#{childid},
+   		 	#{vaccineid},
+   		 	#{nid},
+   		 	#{status},
+   		 	#{pid},
+   		 	#{allname}
+   		 )
+	</insert>
+	
+	<select id="choosephone" resultType="SimpleModel">
+		SELECT
+			"GUARDIANMOBILE" AS "str1", "FATHERPHONE" AS "str2"
+		FROM
+			BS_CHILD_BASEINFO
+		WHERE 
+		("CHILDNAME" = #{name} OR "GUARDIANNAME" = #{name} OR "FATHER" = #{name})
+		 AND to_char("BIRTHDAY",'yyyy-mm-dd') = #{birth}
+	</select>
+	
+	<select id="chooseBaseInfo" resultType="BsChildBaseInfo">
+		SELECT
+			*
+		FROM
+			BS_CHILD_BASEINFO
+		WHERE 
+		("CHILDNAME" = #{name} OR "GUARDIANNAME" = #{name} OR "FATHER" = #{name})
+		AND (GUARDIANMOBILE = #{phone} OR FATHERPHONE = #{phone})
+		AND to_char("BIRTHDAY",'yyyy-mm-dd') = #{birth}
+	</select>
+	
+	<select id="getRecordFinish" resultType="BsRecord">
+		SELECT
+			t.id,
+			t.VACCINEID,
+			t.nid,
+			t."STATUS",
+			t.productid,
+			t.VACC_BIGNAME "allname",
+			t.VACC_NAME "vaccname",
+			t.DOSAGE,
+			t.VACCINATEDATE "vaccinatedate",
+			info.CHILDCODE"childcode"
+		FROM
+			BS_CHILD_VACCINATERECORD t LEFT JOIN BS_CHILD_BASEINFO info ON INFO."ID" = t.CHILDID
+			AND info.LOCALCODE = t.LOCALCODE
+		WHERE info.CHILDCODE = #{value} and t.status = '1' AND t."SOURCE"!='4'
+		ORDER BY SUBSTR (t.nid, 0, 2), t.dosage
+	</select>
+	
+	
+	<!-- 获取计划数据 -->
+	<select id="getNumByid" resultType="BsVaccNum">
+		select * from BS_MANAGE_VACCINENUM where id = #{param1} and "LOCALCODE" = #{param2}
+	</select>
+	
+	<!-- 获取民族列表 -->
+	<select id="getNationList" resultType="BsNation">
+		select * from BS_NATION
+	</select>
+	
+	<!-- 获取医院列表 -->
+	<select id="getHostipallist" resultType="SimpleModel">
+		select "CODE" "str1", "NAME" "str2" from SYS_BIRTH_HOSPITAL ORDER BY INDEX_NUM
+	</select>
+	
+	<!-- 获取医院列表 -->
+	<select id="getHostipal" resultType="java.lang.String">
+		select "NAME" from SYS_BIRTH_HOSPITAL WHERE "CODE"=#{value}
+	</select>
+	
+	<!-- 获取社区列表 -->
+	<select id="getCommunitylist" resultType="SimpleModel">
+		select "CODE" "str1", "NAME" "str2" from SYS_COMMUNITY ORDER BY INDEX_NUM
+	</select>
+	
+	
+	<!-- 根据大类获取产品 -->
+	<select id="getProductListByGroup" resultType="BsProduct">
+		SELECT
+			<include refid="productCol"></include>
+		FROM
+			BS_MANAGE_PRODUCT t		
+		WHERE
+			VACCINEID LIKE '${value}%' and STORENUM > 0
+	</select>
+	
+	<select id="getCmsDisclosureByVacid" resultType="CmsDisclosure">
+		SELECT	cd.* FROM	CMS_DISCLOSURE cd WHERE 	CD. ID = #{value}
+	</select>
+	
+	<select id="getCmsDisclosureByGroupId" resultType="CmsDisclosure">
+		SELECT cd.* FROM CMS_DISCLOSURE cd
+		RIGHT JOIN  BS_MANAGE_VACCINE_MODEL bmv ON bmv."M_NUM"=cd."ID"
+		WHERE bmv."G_NUM" = #{value} and rownum = '1'
+	</select>
+	
+	
+	<select id="getOfficelist" resultType="BsOffice">
+		select * from sys_office
+	</select>
+	
+	<select id="getDeptlist" resultType="SysDept">
+		select * from SYS_VACC_DEPARTMENT WHERE "CODE_LEVEL"='40' ORDER BY INDEX_NUM
+	</select>
+	
+	<select id="findDeptList" resultType="SysDept">
+		select * from SYS_VACC_DEPARTMENT
+		<where>
+			"CODE_LEVEL"='40'
+			<if test="code != null and code != ''">
+				AND "CODE" LIKE '%'||#{code}||'%'
+			</if>
+		</where>
+		ORDER BY INDEX_NUM
+	</select>
+	
+	<!-- 获取所有字典项 -->
+	<select id="getDictList" resultType="SimpleModel">
+		SELECT "VALUE" "str2", LABEL "str1" FROM SYS_DICT WHERE "TYPE" = #{value} ORDER BY "SORT" 
+	</select>
+	<!-- 获取字典标签 -->
+	<select id="getDictLabel" resultType="java.lang.String">
+		SELECT LABEL "str1" FROM SYS_DICT WHERE "TYPE" = #{type} AND "VALUE" = #{value}
+	</select>
+	
+	<!-- 通过产品大类获取有库存不为空的最贵的产品 -->
+	<select id="getProductByGroupExp" resultType="BsProduct">
+		SELECT * FROM (
+			select t.* 			
+			from BS_MANAGE_PRODUCT t
+			where substr(t.vaccineid, 0, 2) = #{group}
+			and t."LOCALCODE" = #{code}
+			and t."STORENUM" &gt; '0'
+			order by t."SELLPRICE" DESC
+		)WHERE ROWNUM = '1'
+	</select>
+	
+	<select id="getDeptlistByCode" resultType="SysDept">
+		SELECT * FROM SYS_VACC_DEPARTMENT WHERE CODE = #{value}
+	</select>
+	
+	<select id="findRabiesList" resultType="BsRabies">
+		SELECT * FROM BS_RABIES_CHECKIN t
+		WHERE t."create_date" > (sysdate - 3)
+		<if test="card != null and card != ''">
+			AND t."card" = #{card}
+		</if>
+		<if test="username != null and username != ''">
+			AND t."username" = #{username}
+		</if>
+		<if test="linkphone != null and linkphone != ''">
+			AND t."linkphone" = #{linkphone}
+		</if>
+	</select>
+	
+	<select id="findVacRemindList" resultType="VacRemind">
+		
+	</select>
+	
+	<select id="getByTempid" resultType="BsRabies">
+		SELECT * FROM BS_RABIES_CHECKIN t
+		WHERE t."create_date" > (sysdate - 3)
+		AND t."tempid" = #{value}
+	</select>
+	
+	<insert id="insertIns">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">  
+        	SELECT sys_guid() FROM DUAL  
+   		</selectKey> 
+		insert into VAC_INSURANCE (
+			"ID",
+			"INS_REQ",
+			"INS_RSV",
+			"INS_TYPE",
+			"INS_CREATE_DATE",
+			"INS_SUCCESS",
+			"INS_CHILDCODE",
+			"INS_RID",
+			"INS_NID"
+			
+		)VALUES(
+			#{id},
+			#{insReq},
+			#{insRsv},
+			#{insType},
+			#{insCreateDate},
+			#{SUCCESS_NO},
+			#{insChildcode},
+			#{insRid},
+			#{insNid}
+		)
+	</insert>
+	
+	<insert id="updateIns">
+		update VAC_INSURANCE set 
+			"INS_REQ" = #{insReq},
+			"INS_RSV" = #{insRsv},
+			"INS_TYPE" = #{insType},
+			"INS_CREATE_DATE" = #{insCreateDate},
+			"INS_SUCCESS" = #{insSuccess},
+			"INS_CHILDCODE" = #{insChildcode},
+			"INS_RID" = #{insRid},
+			"INS_NID" = #{insNid},
+			"INS_POLICY_NO" = #{insPolicyNo},
+			"INS_SERIAL_NO" = #{insSerialNo},
+			"INS_STATUS" = #{insStatus},
+			"INS_REFUND_DATE" = #{insRefundDate}			
+		WHERE "ID" = #{id}
+	</insert>
+	
+	<select id="findListVacInsurance" resultType="VacInsurance">
+		select * from VAC_INSURANCE
+		<where>
+			<if test="insChildcode != null and insChildcode != ''">
+				AND "INS_CHILDCODE" = #{insChildcode}
+			</if>
+			<if test="insNid != null and insNid != ''">
+				AND "INS_NID" = #{insNid}
+			</if>
+			<if test="insSuccess != null and insSuccess != ''">
+				AND "INS_SUCCESS" = #{insSuccess}
+			</if>
+			<if test="insStatus != null and insStatus != ''">
+				AND "INS_STATUS" = #{insStatus}
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkRefundOrder" resultType="BsRecord">
+		select * from BS_CHILD_VACCINATERECORD t left join BS_CHILD_BASEINFO ii on ii."ID" = t."CHILDID"
+		where t."NID" IN (${nid}) and ii."CHILDCODE" = #{childcode} and  t.status &lt;&gt; '9' and t."SOURCE" ='1'
+	</select>
+	
+	<select id="getLastPin" resultType="SimpleModel">
+		SELECT
+			 DISTINCT VAC.PATHEMA "str1", NN."maxpin" "str2"
+		FROM
+			(
+				SELECT
+					v.PATHEMA,
+					v.G_NUM "gNum"
+				FROM
+					"BS_MANAGE_VACCINE" v
+			) vac
+		LEFT JOIN (
+			SELECT
+				"COUNT" (VACCGROUP) "maxpin",
+				VACCGROUP
+			FROM
+				BS_MANAGE_VACCINENUM n
+			WHERE n."LOCALCODE" = #{param2} 
+			GROUP BY
+				VACCGROUP
+		) nn ON nn.VACCGROUP = vac."gNum"
+		WHERE NN.VACCGROUP = #{param1}
+	</select>
+	
+	<select id="findVacChildRemindList" resultType="VacChildRemind">
+		select * from VAC_CHILD_REMIND where "CREATE_DATE" like 'SYSDATE' AND CHILDCODE = #{value}
+	</select>
+	
+	<select id="findJobRemind" resultType="VacChildRemind">
+	SELECT
+		*
+	FROM
+		(
+		SELECT
+			A . ID,
+			A .CHILDCODE,
+			A .REMIND_VACC,
+			A .REMIND_GROUP,
+			"MIN" (A .SELECT_DATE) AS "SELECT_DATE",
+			A .OFFICE,
+			A . SIGN,
+			U .OPENID,
+			v.CHILDNAME,
+			A .DEL_FLAG
+		FROM
+			VAC_CHILD_INFO v
+		LEFT JOIN VAC_CHILD_REMIND A ON v.CHILDCODE = A .CHILDCODE
+		LEFT JOIN VAC_USER U ON v.USERID = U ."ID"
+		GROUP BY
+			A . ID,
+			A .CHILDCODE,
+			A .REMIND_VACC,
+			A .REMIND_GROUP,
+			A .SELECT_DATE,
+			A .OFFICE,
+			A . SIGN,
+			U .OPENID,
+			v.CHILDNAME,
+			A .DEL_FLAG
+	) T WHERE	TO_CHAR (T .SELECT_DATE, 'yy-mm-dd') = TO_CHAR (SYSDATE + 1, 'yy-mm-dd')AND T .DEL_FLAG = '0'
+	</select>
+
+
+	<select id="findAppRemind" resultType="VacChildRemind">
+		SELECT * FROM
+	(
+		SELECT
+			a . ID,
+			A .CHILDCODE,
+			A .REMIND_VACC,
+			A .REMIND_GROUP,
+			"MIN" (A .SELECT_DATE) AS "SELECT_DATE",
+			A .OFFICE,
+			A . SIGN,
+			U .REGISTRATIONID,
+			v.CHILDNAME,
+			v.PHONE,
+			A .DEL_FLAG
+		FROM
+			VAC_CHILD_BASEINFO v
+		LEFT JOIN VAC_CHILD_REMIND A ON v.CHILDCODE = A .CHILDCODE
+		LEFT JOIN VAC_USER_LIST U ON v.PHONE = U ."PHONE"
+		GROUP BY
+			a . ID,
+			A .CHILDCODE,
+			A .REMIND_VACC,
+			A .REMIND_GROUP,
+			A .SELECT_DATE,
+			A .OFFICE,
+			A . SIGN,
+			U .REGISTRATIONID,
+			v.CHILDNAME,
+			v.PHONE,
+			A .DEL_FLAG
+			) T
+		WHERE
+			TO_CHAR (T .SELECT_DATE, 'yy-mm-dd') = TO_CHAR (SYSDATE + 1, 'yy-mm-dd') AND T.DEL_FLAG='0'
+	</select>
+
+
+	<update id="clearJobRemind">
+		DELETE FROM VAC_CHILD_REMIND WHERE SELECT_DATE &lt; SYSDATE-1
+	</update >
+
+	<!-- 手机号码查询关注儿童列表 -->
+	<select id="getBsChildBaseInfoByPhone" resultType="BsChildBaseInfo">
+		SELECT t.* FROM BS_CHILD_BASEINFO T
+			RIGHT JOIN VAC_CHILD_APPINFO b ON b.childcode = T .childcode
+				WHERE(b."PHONE"  = #{value})
+	</select>
+
+	<!-- 根据接种单位获取社区列表 -->
+	<select id="getCommunity" resultType="SimpleModel">
+		select "CODE" "str1", "NAME" "str2" from SYS_COMMUNITY WHERE "LOCALCODE"  = #{value} ORDER BY INDEX_NUM
+	</select>
+
+	<select id="getByChildcode" resultType="Response">
+		SELECT	* FROM 	BS_CHILD_RESPONSE WHERE  CHILDCODE = #{childcode} AND NID = #{nid} ORDER BY CREATE_DATE DESC
+	</select>
+
+	<insert id="insertResponse">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT sys_guid() FROM DUAL
+		</selectKey>
+		insert into BS_CHILD_RESPONSE (
+			"ID",
+			"CHILDCODE",
+			"NID",
+			"SUBMITTIME",
+			"SUBMITMAGE",
+			"SUBMITTEXT",
+			"VACCIN_ID"
+		)VALUES(
+			#{id},
+			#{childcode},
+			#{nid},
+			#{submittime},
+			#{submitmage},
+			#{submittext},
+			#{vaccinId}
+		)
+	</insert>
+
+	<select id="getByModelId" resultType="String">
+		SELECT  "ID"	FROM	BS_MANAGE_VACCINE_MODEL 	WHERE	m_num = #{value} AND ROWNUM = 1
+	</select>
+
+ 	<!-- 计算已接种疫苗  edit by wangnan 2018-2-27 -->
+   	<select id="getvaccRecordFinish" resultType="java.util.Map">
+		SELECT
+			t.ID AS ID,
+			t.VACC_NAME AS VACCNAME,
+			t.DOSAGE AS DOSAGE,
+			TO_CHAR(t.VACCINATEDATE,'yyyy-mm-dd') AS  VACCDATE,
+			t.nid as NID
+		FROM
+			BS_CHILD_VACCINATERECORD t INNER  JOIN BS_CHILD_BASEINFO B ON B.ID = t.CHILDID
+			AND B.LOCALCODE = t.LOCALCODE AND B.CHILDCODE = #{childcode}
+		WHERE   t.STATUS = '1' AND t.SOURCE!='4'
+		ORDER BY t.NID, t.DOSAGE
+	</select>
+	
+	<!-- 获取不良反应表中的回复时间  edit by wangnan 2018-2-28 -->
+	<select id="getAFEI" resultType="java.lang.String">
+		SELECT
+			SUBMITTIME FROM(
+				SELECT
+					SUBMITTIME
+				FROM
+					BS_CHILD_RESPONSE
+				WHERE
+					CHILDCODE = #{childcode}
+					AND NID = #{NID}
+				ORDER BY SUBMITTIME DESC
+				)
+		WHERE ROWNUM=1
+	</select>
+	
+	<!--   edit by wangnan 2018-3-1 -->
+	<select id="getResponseDetail" resultType="java.util.Map">
+		SELECT
+			SUBMITMAGE,SUBMITTEXT,REPLYCONTENT,
+			TO_CHAR (SUBMITTIME, 'yyyy-mm-dd HH24:mi:ss')  SUBMITTIME
+		FROM
+			BS_CHILD_RESPONSE
+		WHERE
+			CHILDCODE = #{childcode} 
+			AND NID = #{nid}
+		ORDER BY
+			SUBMITTIME 
+
+	</select>
+	
+	<!-- 获取最新版本信息  edit by wangnan 2018-3-1-->
+	<select id="getAPPVersion" resultType="java.util.Map">
+		
+		SELECT VERSION,URL
+		 FROM
+			(SELECT	VERSION,URL
+			FROM
+				SYS_APP_VERSION
+			WHERE
+				STATUS = '1'
+
+			ORDER BY CREATETIME DESC)
+			WHERE ROWNUM = 1 
+
+	</select>
+
+</mapper>

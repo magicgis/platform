@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.junl.wpwx.mapper.VacOrderMapper">
+    
+	<sql id="vacOrderColumns">
+		a.id AS "id",
+		a.orderno AS "orderNo",
+		a.productid AS "productid",
+		a.productname AS "productname",
+		a.userid AS "userid",
+		a.payprice AS "payprice",
+		a.paytype AS "paytype",
+		a.status AS "status",
+		a.ordertime AS "ordertime",
+		a.paytime AS "paytime",
+		a.mobile AS "mobile",
+		a.transactionno AS "transactionno",
+		a.callbacktime AS "callbacktime",
+		a.utmsource AS "utmsource",
+		a.isvaccine AS "isvaccine",
+		a.childcode ,
+		a.numid,
+		a.insurance
+	</sql>
+	
+	<sql id="vacOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="VacOrder">
+		SELECT 
+			<include refid="vacOrderColumns"/>
+		FROM vac_order a
+		<include refid="vacOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacOrder">
+		SELECT 
+			<include refid="vacOrderColumns"/>
+		FROM vac_order a
+		<include refid="vacOrderJoins"/>
+		<where>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="orderNo != null and orderNo != ''">
+				AND a.orderno = #{orderNo}
+			</if>
+			<if test="payprice != null and payprice != ''">
+				AND a.payprice = #{payprice}
+			</if>
+			<if test="childcode != null and childcode != ''">
+				AND a.childcode = #{childcode}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="insurance != null and insurance != ''">
+				AND a.insurance = #{insurance}
+			</if>
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	
+	<insert id="insert">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		</selectKey> 
+		INSERT INTO vac_order(
+			id,
+			orderno,
+			productid,
+			productname,
+			userid,
+			payprice,
+			paytype,
+			status,
+			ordertime,
+			paytime,
+			mobile,
+			transactionno,
+			callbacktime,
+			utmsource,
+			isvaccine,
+			childcode,
+			numid,
+			insurance
+		) VALUES (
+			#{id},
+			#{orderNo},
+			#{productid},
+			#{productname},
+			#{userid},
+			#{payprice},
+			#{paytype},
+			#{status},
+			#{ordertime},
+			#{paytime},
+			#{mobile},
+			#{transactionno},
+			#{callbacktime},
+			#{utmsource},
+			#{isvaccine},
+			#{childcode},
+			#{numid},
+			#{insurance}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_order SET 	
+			orderno = #{orderNo},
+			productid = #{productid},
+			productname = #{productname},
+			userid = #{userid},
+			payprice = #{payprice},
+			paytype = #{paytype},
+			status = #{status},
+			ordertime = #{ordertime},
+			paytime = #{paytime},
+			mobile = #{mobile},
+			transactionno = #{transactionno},
+			callbacktime = #{callbacktime},
+			utmsource = #{utmsource},
+			isvaccine = #{isvaccine},
+			childcode = #{childcode},
+			numid = #{numid},
+			insurance = #{insurance}
+
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM vac_order
+		WHERE id = #{id}
+	</update>
+	
+	<insert id="insertBsOrder">
+	    <selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		</selectKey> 
+	    insert into BS_ORDER (
+	    	id,
+			order_no,
+			serial_no,
+			channel,
+			source,
+			order_time,
+			pay_time,
+			call_time,
+			user_id,
+			child_code,
+			openid,
+			vaccine_id,
+			vaccine_type,
+			manufacturer,
+			batch,
+			price,
+			num,
+			remarks,
+			beneficiary,
+			total
+	    )VALUES(
+		    #{id},
+			#{orderNo},
+			#{serialNo},
+			#{channel},
+			#{source},
+			#{orderTime},
+			#{payTime},
+			#{callTime},
+			#{userId},
+			#{childCode},
+			#{openid},
+			#{vaccineId},
+			#{vaccineType},
+			#{manufacturer},
+			#{batch},
+			#{price},
+			#{num},
+			#{remarks},
+			#{beneficiary},
+			#{total}
+	    )	    
+	</insert>
+	
+	<select id="findBsOrderList" resultType="BsOrder">
+	    select * from BS_ORDER
+	    <where>
+	        <if test="orderNo != null and orderNo != ''">
+	            AND ORDER_NO = #{orderNo}
+	        </if>
+	        <if test="total != null and total != ''">
+	            AND TOTAL = #{total}
+	        </if>
+	        <if test="beneficiary != null and beneficiary != ''">
+	            AND BENEFICIARY = #{beneficiary}
+	        </if>
+	        <if test="source != null and source != ''">
+	            AND SOURCE = #{source}
+	        </if>
+	        <if test="childCode != null and childCode != ''">
+	            AND CHILD_CODE = #{childCode}
+	        </if>
+	    </where>
+	    
+	</select>
+</mapper>

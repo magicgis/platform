@@ -1,0 +1,31 @@
+.banner {
+	height: 1.5rem;
+}
+
+.banner>img {
+	height: 100%;
+	width: 100%;
+}
+
+.fr{
+	float: right;
+}
+.color-grey {
+	color: #B1B1B1;
+}
+
+.lista{
+	text-decoration: none;
+	color: #000;
+}
+
+.strong{
+	font-weight: bold;
+}
+
+.red{
+	color: red;
+}
+.clearfix {
+	overflow:hidden!important;
+}

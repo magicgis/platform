@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.VacChildTempMapper">
+    
+	<select id="get" resultType="VacChildTemp">
+		SELECT 
+			a.*,a.REGADDRESS AS "ADD" ,b."NAME" AS "officeInfoName"
+		FROM vac_child_temp a LEFT JOIN SYS_VACC_DEPARTMENT b ON b."CODE" = a."OFFICEINFO"
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacChildTemp">
+		SELECT 
+			a.*,a.REGADDRESS AS "ADD" ,b."NAME" AS "officeInfoName"
+		FROM vac_child_temp a LEFT JOIN SYS_VACC_DEPARTMENT b ON b."CODE" = a."OFFICEINFO"
+		<where>
+			
+			<if test="childcode != null and childcode != ''">
+				AND a.childcode = #{childcode}
+			</if>
+			<if test="cardcode != null and cardcode != ''">
+				AND a.cardcode LIKE '%'||#{cardcode}||'%'
+			</if>
+			<if test="birthcode != null and birthcode != ''">
+				AND a.birthcode LIKE '%'||#{birthcode}||'%'
+			</if>
+			<if test="childname != null and childname != ''">
+				AND a.childname LIKE '%'||#{childname}||'%'
+			</if>
+			<if test="gender != null and gender != ''">
+				AND a.gender = #{gender}
+			</if>
+			<if test="guardianname != null and guardianname != ''">
+				AND a.guardianname LIKE '%'||#{guardianname}||'%'
+			</if>
+			<if test="guardianmobile != null and guardianmobile != ''">
+				AND a.guardianmobile LIKE '%'||#{guardianmobile}||'%'
+			</if>
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY #{orderBy}
+		</if>
+	</select>
+	
+	
+	<insert id="insert">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		 </selectKey> 
+		INSERT INTO vac_child_temp(
+			"ID",
+			"CHILDCODE",
+			"CARDCODE",
+			"BIRTHCODE",
+			"CHILDNAME",
+			"GENDER",
+			"BIRTHDAY",
+			"BIRTHHOSTIPAL",
+			"BIRTHWEIGHT",
+			"GUARDIANNAME",
+			"GUARDIANRELATION",
+			"HOMEADDRESS",
+			"REGISTRYADDRESS",
+			"PARADOXICALREACTION",
+			"OFFICEINFO",
+			"CREATEDATE",
+			"CREATER",
+			"GUARDIANMOBILE",
+			"GUARDIANIDENTIFICATIONNUMBER",
+			"PROVINCE",
+			"CITY",
+			"COUNTY",
+			"ADDRESS",
+			"PR",
+			"CI",
+			"CO",
+			"NATION",
+			"CHILDORDER",
+			"SITUATION",
+			"PROPERTIES",
+			"RESIDE",
+			"AREA",
+			"FATHER",
+			"FATHERPHONE",
+			"MAILINGADDRESS",
+			"FATHERCARD",
+			"REGADDRESS",
+			"OFFICECODE",
+			"REMARKS",
+			"TEMPID",
+			"USERID",
+			"FILEORIGIN"
+		)
+		VALUES (
+			#{id},
+			#{childcode},
+			#{cardcode},
+			#{birthcode},
+			#{childname},
+			#{gender},
+			#{birthday},
+			#{birthhostipal},
+			#{birthweight},
+			#{guardianname},
+			#{guardianrelation},
+			#{homeaddress},
+			#{registryaddress},
+			#{paradoxicalreaction},
+			#{officeinfo},
+			sysdate,
+			#{creater},
+			#{guardianmobile},
+			#{guardianidentificationnumber},
+			#{province},
+			#{city},
+			#{county},
+			#{address},
+			#{pr},
+			#{ci},
+			#{co},
+			#{nation},
+			#{childorder},
+			#{situation},
+			#{properties},
+			#{reside},
+			#{area},
+			#{father},
+			#{fatherphone},
+			#{mailingaddress},
+			#{fathercard},
+			#{add},
+			#{officecode},
+			#{remarks},
+			#{tempid},
+			#{userId},
+			#{fileorigin}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_child_temp SET 	
+			STATUS =#{status}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM vac_child_temp
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deletereal">
+		DELETE FROM vac_child_temp
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getByCode" resultType="VacChildTemp">
+		<!-- SELECT a.*,a.REGADDRESS AS "ADD" ,b."NAME" AS "officeInfoName"
+		FROM vac_child_temp a LEFT JOIN SYS_VACC_DEPARTMENT b ON b."CODE" = a."OFFICEINFO"
+		where a."CHILDCODE" = #{value} AND a."STATUS"='0' -->
+		SELECT 
+			a.*,a.REGADDRESS AS "ADD"
+		FROM 
+			vac_child_temp a 
+		where 
+			a."CHILDCODE" = #{value} AND a."STATUS"='0'
+		<!-- 三天之内 -->
+		<!-- AND a.CREATEDATE &gt; (sysdate-3) -->
+	</select>
+
+	<select id="getByPhone" resultType="VacChildTemp">
+		SELECT a.*
+		FROM vac_child_temp a
+		where a."GUARDIANMOBILE" = #{value}
+		ORDER BY a.CREATEDATE DESC
+		<!-- 三天之内 -->
+		<!-- AND a.CREATEDATE &gt; (sysdate-3) -->
+	</select>
+
+	<update id="deleteJob">
+		DELETE FROM vac_child_temp
+		WHERE CREATEDATE &lt; (sysdate-3)
+	</update>
+	
+	<select id="getlastcode" resultType="java.lang.String">
+		SELECT CHILDCODE FROM vac_child_temp  ORDER BY CHILDCODE DESC
+	</select>
+	
+	<!-- edit by wangnan 2018-2-8 建档记录APP -->
+	<select id="getRecordByUserID" resultType="java.util.Map">
+		SELECT 
+			 ID,CHILDNAME,TO_CHAR(CREATEDATE,'yyyy-mm-dd hh24:mi:ss') AS CREATEDATE 
+		FROM
+			VAC_CHILD_TEMP 
+		WHERE USERID= #{userId}
+		ORDER BY CREATEDATE DESC
+	</select>
+	
+	<!-- edit by wangnan 2018-2-9 建档记录详情APP -->
+	<select id="getRecordByID" resultType="java.util.Map">
+		SELECT
+			CHILDCODE,CHILDNAME,
+			CARDCODE,BIRTHCODE,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY,	
+			(select A.LABEL from SYS_DICT A where A.TYPE='sex' and A.VALUE=B.GENDER ) AS SEX,
+			CHILDORDER,
+			(select A.LABEL from SYS_DICT A where A.TYPE='nation' and A.VALUE=B.NATION ) AS NATION,
+			BIRTHWEIGHT,
+			GUARDIANNAME,
+			GUARDIANMOBILE,
+			GUARDIANIDENTIFICATIONNUMBER AS GUARDIANCARDCODE ,
+			FATHER AS FATHERNAME,FATHERPHONE,FATHERCARD AS FATHERCARDCODE,
+			(select A.LABEL from SYS_DICT A where A.TYPE='properties' and A.VALUE=B.PROPERTIES ) AS PROPERTIES,
+			(select A.LABEL from SYS_DICT A where A.TYPE='reside' and A.VALUE=B.RESIDE ) AS RESIDE,
+			(select A.NAME from SYS_BIRTH_HOSPITAL A where A.CODE = B.BIRTHHOSTIPAL ) AS BIRTHHOSTIPAL,
+			<!-- HOMEADDRESS,
+			REGISTRYADDRESS -->
+			(select A.NAME from SYS_AREA A where A.ID = B.PROVINCE )||(select A.NAME from SYS_AREA A where A.ID = B.CITY )||(select A.NAME from SYS_AREA A where A.ID = B.COUNTY )||ADDRESS AS	HOMEADDRESS,
+ 			(select A.NAME from SYS_AREA A where A.ID = B.PR )||(select A.NAME from SYS_AREA A where A.ID = B.CI )||(select A.NAME from SYS_AREA A where A.ID = B.CO )||REGADDRESS AS REGISTRYADDRESS 
+			
+		FROM
+			VAC_CHILD_TEMP B
+
+		WHERE ID= #{childId}
+	</select>
+	
+	<!-- edit by wangnan 2018-3-2 建档记录详情APP,通过childcode -->
+	<select id="getRecordByCode" resultType="java.util.Map">
+		SELECT
+			CHILDCODE,CHILDNAME,
+			CARDCODE,BIRTHCODE,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY,	
+			(select A.LABEL from SYS_DICT A where A.TYPE='sex' and A.VALUE=B.GENDER ) AS SEX,
+			CHILDORDER,
+			(select A.LABEL from SYS_DICT A where A.TYPE='nation' and A.VALUE=B.NATION ) AS NATION,
+			BIRTHWEIGHT,
+			GUARDIANNAME,
+			GUARDIANMOBILE,
+			GUARDIANIDENTIFICATIONNUMBER AS GUARDIANCARDCODE ,
+			FATHER AS FATHERNAME,FATHERPHONE,FATHERCARD AS FATHERCARDCODE,
+			(select A.LABEL from SYS_DICT A where A.TYPE='properties' and A.VALUE=B.PROPERTIES ) AS PROPERTIES,
+			(select A.LABEL from SYS_DICT A where A.TYPE='reside' and A.VALUE=B.RESIDE ) AS RESIDE,
+			(select A.NAME from SYS_BIRTH_HOSPITAL A where A.CODE = B.BIRTHHOSTIPAL ) AS BIRTHHOSTIPAL,
+			<!-- HOMEADDRESS,
+			REGISTRYADDRESS -->
+			(select A.NAME from SYS_AREA A where A.ID = B.PROVINCE )||(select A.NAME from SYS_AREA A where A.ID = B.CITY )||(select A.NAME from SYS_AREA A where A.ID = B.COUNTY )||ADDRESS AS	HOMEADDRESS,
+ 			(select A.NAME from SYS_AREA A where A.ID = B.PR )||(select A.NAME from SYS_AREA A where A.ID = B.CI )||(select A.NAME from SYS_AREA A where A.ID = B.CO )||REGADDRESS AS REGISTRYADDRESS 
+			
+		FROM
+			VAC_CHILD_TEMP B
+
+		WHERE CHILDCODE= #{childcode}
+	</select>
+	
+
+	<!-- edit by wangnan 2018-2-23预约记录APP -->
+	<!--  REMIND_DATE 与 select_date ,REMIND_DATE-->			
+	<select id="getRemidRecordByID" resultType="java.util.Map">
+		SELECT
+			A.ID AS ID,
+			A .REMIND_VACC AS REMIND_VACC,
+			A.VACC_ID AS VACC_ID,
+			TO_CHAR (A .SELECT_DATE, 'yyyy-mm-dd')  REMIND_DATE,
+	 		A . SIGN AS SIGN ,
+			A.INSURANCE_ID AS INSURANCE_ID,
+			A.PAY_PRICE AS PAY_PRICE,
+			A.PAY_STATUS AS PAY_STATUS
+			<!-- ,B.CHILDNAME AS CHILDNAME,
+			TO_CHAR (B.BIRTHDAY	, 'yyyy-mm-dd')  BIRTHDAY -->
+
+		FROM
+			VAC_CHILD_REMIND A
+			INNER JOIN BS_CHILD_BASEINFO B ON B.CHILDCODE = A .CHILDCODE
+		AND B. ID =  #{childId} 
+		WHERE  A.status='0' AND A.DEL_FLAG='0'
+		AND  TRUNC (A .SELECT_DATE, 'dd') &lt;TRUNC (SYSDATE + 7, 'dd')
+	</select>
+	
+	<!-- edit by wangnan 2018-3-2预约记录APP -->
+	<!--  REMIND_DATE 与 select_date ,REMIND_DATE-->			
+	<select id="getRemidRecordByCode" resultType="java.util.Map">
+		SELECT
+			A.ID AS ID,
+			A .REMIND_VACC AS REMIND_VACC,
+			A.VACC_ID AS VACC_ID,
+			TO_CHAR (A .SELECT_DATE, 'yyyy-mm-dd')  REMIND_DATE,
+	 		A . SIGN AS SIGN ,
+			A.INSURANCE_ID AS INSURANCE_ID,
+			A.PAY_PRICE AS PAY_PRICE,
+			A.PAY_STATUS AS PAY_STATUS
+			<!-- ,B.CHILDNAME AS CHILDNAME,
+			TO_CHAR (B.BIRTHDAY	, 'yyyy-mm-dd')  BIRTHDAY -->	
+
+		FROM
+			VAC_CHILD_REMIND A
+			INNER JOIN BS_CHILD_BASEINFO B ON B.CHILDCODE = A .CHILDCODE
+		AND B. CHILDCODE =  #{childcode} 
+		WHERE  A.status='0' AND A.DEL_FLAG='0'
+		<!-- AND  TRUNC (A .SELECT_DATE, 'dd') &lt;TRUNC (SYSDATE + 7, 'dd') -->
+	</select>
+		
+			
+	<!-- 获取医院列表 edit by wangnan 20158-2-23-->
+	<select id="getHostipallist" resultType="java.util.Map">
+		SELECT CODE,NAME 
+		FROM
+			SYS_BIRTH_HOSPITAL
+		<!-- WHERE substr(CODE,1,6) = #{code} -->
+		WHERE substr(CODE,1,4) = #{code}
+		OR CODE = '0098000000'
+		OR code = '0099000000'
+		ORDER BY
+			INDEX_NUM
+	</select>
+	
+	<!-- edit by wangnan 2018-2-23预约记录APP -->
+	<select id="findChildRemind" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			VAC_CHILD_REMIND  
+		where ID=#{id} 
+	</select>
+
+
+	<insert id="inserChildTemp">
+		INSERT INTO vac_child_temp(
+		"ID",
+		"CHILDCODE",
+		"CARDCODE",
+		"BIRTHCODE",
+		"CHILDNAME",
+		"GENDER",
+		"BIRTHDAY",
+		"BIRTHHOSTIPAL",
+		"BIRTHWEIGHT",
+		"GUARDIANNAME",
+		<!-- "HOMEADDRESS",
+		"REGISTRYADDRESS", -->
+		"ADDRESS",
+		"REGADDRESS",
+		"PARADOXICALREACTION",
+		"CREATEDATE",
+		"GUARDIANMOBILE",
+		"GUARDIANIDENTIFICATIONNUMBER",
+		"PROVINCE",
+		"CITY",
+		"COUNTY",
+		"PR",
+		"CI",
+		"CO",
+		"NATION",
+		"CHILDORDER",
+		"PROPERTIES",
+		"RESIDE",
+		"FATHER",
+		"FATHERPHONE",
+		"FATHERCARD",
+		"REMARKS",
+		"TEMPID",
+		"USERID",
+		"FILEORIGIN",
+		"REGISTRATIONID"
+		)
+		VALUES (
+		#{id},
+		#{childcode},
+		#{childIdentity},
+		#{childBirthdayNo},
+		#{childName},
+		#{childSex},
+		#{childBirthday},
+		#{hospitalId},
+		#{childWeight},
+		#{childMomName},
+		#{familyAddress},
+		#{registerAddress},
+		#{abnormal},
+		sysdate,
+		#{childMomMobile},
+		#{childMomIdentity},
+		#{province},
+		#{city},
+		#{familyaId},
+		#{pr},
+		#{ci},
+		#{registeraId},
+		#{childNationNo},
+		#{parityNo},
+		#{registeredTypeNo},
+		#{liveId},
+		#{childFatherName},
+		#{childFatherMobile},
+		#{childFatherIdentity},
+		#{remark},
+		<!-- #{childcode}, -->
+		#{tempid},
+		#{userId},
+		#{fileorigin},
+		#{registrationID}
+		)
+	</insert>
+
+
+	
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+	updateCheck="false">
+	
+	<diskStore path="java.io.tmpdir" />
+	
+	<defaultCache eternal="false" 
+		maxElementsInMemory="1000"
+		overflowToDisk="false" 
+		diskPersistent="false" 
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="10000" 
+		memoryStoreEvictionPolicy="LFU" />
+
+	<!-- 短信验证码300秒 -->
+	<cache name="messageCache" 
+		eternal="false" 
+		maxElementsInMemory="500"
+		overflowToDisk="false" 
+		diskPersistent="false" 
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="1200" 
+		memoryStoreEvictionPolicy="LFU" />
+		
+	<!-- 行政区域区域缓存 -->
+	<cache name="areaCache" 
+		eternal="false" 
+		maxElementsInMemory="5000"
+		overflowToDisk="false" 
+		diskPersistent="false" 
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="7200" 
+		memoryStoreEvictionPolicy="LFU" />
+	
+	<!-- 微信access_token7000秒 -->	
+	<cache name="tokenCache" 
+		eternal="false" 
+		maxElementsInMemory="5000"
+		overflowToDisk="false" 
+		diskPersistent="false" 
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="7000" 
+		memoryStoreEvictionPolicy="LFU" />
+		
+</ehcache>
+

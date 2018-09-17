@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.VacRabiesTempMapper">
+
+	<select id="get" resultType="VacRabiesTemp">
+  	select * from VAC_RABIES_TEMP where id = #{value} and "CREATEDATE" > (sysdate - 3)
+  </select>
+
+	<select id="getByTempid" resultType="VacRabiesTemp">
+  	select * from VAC_RABIES_TEMP where "TEMPID" = #{value} and "CREATEDATE" > (sysdate - 3)
+  </select>
+
+	<select id="findVacRemindList" resultType="VacRemind">
+		SELECT
+		a.*
+		<if test="rtype != null and rtype != '' and rtype == 1">
+			,NVL(c."rabiescode",0) AS "ncode"
+		</if>
+		<if test="rtype != null and rtype != '' and rtype == 2">
+			,NVL(c.hepa_b_code,0) AS "ncode"
+		</if>
+		FROM VAC_JOB_REMIND a
+		<if test="rtype != null and rtype != '' and rtype == 1">
+			LEFT JOIN BS_RABIES_NUM b ON b."id" = a.id
+			LEFT JOIN BS_RABIES_CHECKIN c ON c."id" = b."checkid"
+		</if>
+		<if test="rtype != null and rtype != '' and rtype == 2">
+			LEFT JOIN BS_HEPATITIS_B_NUM b ON b.id = a.id
+			LEFT JOIN BS_HEPATITIS_BCHECKIN c ON c.id = b.check_id
+		</if>
+		<where>
+			<if test="openid != null and openid != ''">
+				AND a.openid = #{openid}
+			</if>
+			<if test="rtype != null and rtype != ''">
+				AND a.rtype = #{rtype}
+			</if>
+			AND trunc(a.ctxdate,'dd') <![CDATA[ >= ]]> trunc(sysdate,'dd')
+			AND (TRUNC (a.ctxdate, 'dd') - TRUNC (SYSDATE, 'dd')) <![CDATA[ <= ]]> 7
+		</where>
+		ORDER BY a.createdate asc,a.ctxdate asc
+	</select>
+
+	<select id="findVacRemindSignList" resultType="VacRemind">
+		SELECT * FROM VAC_JOB_REMIND
+		<where>
+			trunc(ctxdate,'dd') = trunc(#{ctxdate},'dd')
+			<if test="openid != null and openid != ''">
+				AND openid = #{openid}
+			</if>
+			<if test="rtype != null and rtype != ''">
+				AND rtype = #{rtype}
+			</if>
+			<if test="office != null and office != ''">
+				AND office = #{office}
+			</if>
+			<if test="sign != null and sign != ''">
+				AND sign = #{sign}
+			</if>
+			<if test="ctxusername != null and ctxusername != ''">
+				AND ctxusername = #{ctxusername}
+			</if>
+		</where>
+	</select>
+
+	<select id="findVacRemind" resultType="VacRemind">
+		SELECT * FROM VAC_JOB_REMIND
+		<where>
+			<if test="openid != null and openid != ''">
+				AND openid = #{openid}
+			</if>
+			<if test="rtype != null and rtype != ''">
+				AND rtype = #{rtype}
+			</if>
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</where>
+	</select>
+
+	<select id="findVacRemindById" resultType="VacRemind">
+		SELECT
+		s.vid AS "vid",
+		s.id AS "sid",
+		s.signature AS "signature",
+		s.stype AS "stype"
+		FROM
+		VAC_JOB_REMIND v
+		LEFT JOIN VAC_JOB_SIGN s ON v.id = s.vid
+		WHERE
+		v.id = #{param1}
+		AND v.office = #{param2}
+	</select>
+
+	<select id="getCmsDisclosureByVacid" resultType="CmsDisclosure">
+		SELECT cd.* FROM CMS_DISCLOSURE cd
+		RIGHT JOIN  BS_MANAGE_VACCINE bmv ON bmv."BAN"=cd."ID"
+		WHERE bmv."ID" = #{value}
+	</select>
+
+	<insert id="insertSignature">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT sys_guid() FROM DUAL
+		</selectKey>
+		INSERT INTO VAC_JOB_SIGN (
+		"ID",
+		"SIGNATURE",
+		"STYPE",
+		"VID"
+		)VALUES(
+		#{id},
+		#{signature},
+		#{stype},
+		#{vid}
+		)
+	</insert>
+
+	<update id="updateSign">
+		UPDATE VAC_JOB_REMIND SET
+		"SIGN" = #{sign}
+		WHERE "ID" = #{vid}
+	</update>
+
+	<insert id="insert">
+		INSERT INTO VAC_RABIES_TEMP(
+		"ID",
+		"USERNAME",
+		"SEX",
+		"LINKPHONE",
+		"BITEDATE",
+		"BITEPART",
+		"ANIMAL",
+		"DEALDATE",
+		"DEALADDRESS",
+		"CARD",
+		"WEIGHT",
+		"PROVINCE",
+		"CITY",
+		"COUNTY",
+		"ADDRESS",
+		"CREATEDATE",
+		"OPENID",
+		"TEMPID",
+		"AGE",
+		"BITETYPE"
+		)
+		VALUES (
+		#{id},
+		#{username},
+		#{sex},
+		#{linkphone},
+		#{bitedate},
+		#{bitepart},
+		#{animal},
+		#{dealdate},
+		#{dealaddress},
+		#{card},
+		#{weight},
+		#{province},
+		#{city},
+		#{county},
+		#{address},
+		sysdate,
+		#{openid},
+		#{tempid},
+		#{age},
+		#{bitetype}
+		)
+	</insert>
+
+	<delete id="deleteReal">
+		delete from VAC_RABIES_TEMP where id = #{value}
+	</delete>
+
+	<insert id="insertHepb">
+		INSERT INTO VAC_HEPB_TEMP(
+		ID,
+		USERNAME,
+		SEX,
+		LINKPHONE,
+		BIRTHDAY,
+		IDCARDNO,
+		WEIGHT,
+		AGE,
+		ADDRESS,
+		PROVINCE,
+		CITY,
+		COUNTY,
+		CREATEDATE,
+		OPENID,
+		TEMPID,
+		HISTORY)
+		VALUES(
+		#{id},
+		#{username},
+		#{sex},
+		#{linkPhone},
+		#{birthday},
+		#{idcardNo},
+		#{weight},
+		#{age},
+		#{address},
+		#{province},
+		#{city},
+		#{county},
+		#{createDate},
+		#{openId},
+		#{tempId},
+		#{history}
+		)
+	</insert>
+
+	<select id="getHepb" resultType="VacHepbTemp">
+		select * from VAC_HEPB_TEMP where id = #{value}
+	</select>
+
+	<select id="getHepbByTempid" resultType="BsHepb">
+		SELECT * FROM BS_HEPATITIS_BCHECKIN t
+		WHERE t.create_date > (sysdate - 3)
+		AND t.temp_id = #{value}
+	</select>
+</mapper>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.vacuserlist.dao.VacUserListDao">
+    
+	<sql id="vacUserListColumns">
+		a.id AS "id",
+		a.openid AS "openid",
+		a.uid AS "uid",
+		a.mark AS "mark",
+		a.registrationid AS "registrationid",
+		a.phone AS "phone",
+		a.password AS "password",
+		a.nickname AS "nickname",
+		a.image AS "image",
+		a.imagepath AS "imagepath",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="vacUserListJoins">
+	</sql>
+    
+	<select id="get" resultType="VacUserList">
+		SELECT 
+			<include refid="vacUserListColumns"/>
+		FROM vac_user_list a
+		<include refid="vacUserListJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacUserList">
+		SELECT 
+			<include refid="vacUserListColumns"/>
+		FROM vac_user_list a
+		<include refid="vacUserListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="VacUserList">
+		SELECT 
+			<include refid="vacUserListColumns"/>
+		FROM vac_user_list a
+		<include refid="vacUserListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO vac_user_list(
+			id,
+			openid,
+			uid,
+			mark,
+			registrationid,
+			phone,
+			password,
+			nickname,
+			image,
+			imagepath,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{openid},
+			#{uid},
+			#{mark},
+			#{registrationid},
+			#{phone},
+			#{password},
+			#{nickname},
+			#{image},
+			#{imagepath},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_user_list SET 	
+			openid = #{openid},
+			uid = #{uid},
+			mark = #{mark},
+			registrationid = #{registrationid},
+			phone = #{phone},
+			password = #{password},
+			nickname = #{nickname},
+			image = #{image},
+			imagepath = #{imagepath},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE vac_user_list SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,35 @@
+
+
+.list-title {
+	height: 40px;
+	background-color: #F1F1F1;
+	line-height: 40px;
+	padding-left: 5px;
+	font-size: 16px;
+	border-bottom: 1px solid #CBCACC;
+}
+
+.list-item {
+	height: 55px;
+	background-color: #fff;
+	border-bottom: 1px solid #CBCACC;
+	position: relative;
+}
+
+.list-head-img {
+	height: 40px;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+}
+
+.list-infos {
+	box-sizing: border-box;
+	margin-left: 55px;
+	height: 100%;
+	padding: 5px;
+}
+
+.list-infos .desc {
+	margin-top: 5px;
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.DepartmentInfoMapper">
+
+	<sql id="sysHolidayColumns">
+		a."ID" AS "id",
+		a.localcode AS "localcode",
+		a.localname AS "localname",
+		a.jobstime AS "jobstime",
+		a.phonenumber AS "phonenumber",
+		a.address AS "address",
+		a.remarks AS "remarks"
+	</sql>
+
+
+
+	<select id="findByLocalcode" resultType="DepartmentInfo">
+		SELECT
+		 	<include refid="sysHolidayColumns"/>
+		  FROM  SYS_VACC_DEPARTMENT_INFO a
+		WHERE  a.LOCALCODE= #{value}
+	</select>
+
+	<select id="findByChildId" resultType="java.util.Map">
+		SELECT
+			A.LOCALNAME,
+			A.ADDRESS,
+			A.JOBSTIME,
+			A.PHONENUMBER,
+			A.REMARKS
+		FROM
+			SYS_VACC_DEPARTMENT_INFO A
+				INNER JOIN BS_CHILD_BASEINFO B ON A.LOCALCODE= B.LOCALCODE AND 
+ 			B.ID = #{childId}
+	</select>
+
+
+
+</mapper>

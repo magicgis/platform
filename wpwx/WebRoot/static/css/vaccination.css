@@ -1,0 +1,425 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 98%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:15px; 
+}
+
+body {
+    font-size: 14px;
+    color: #333;
+}
+
+ul,
+li {
+    list-style-type: none;
+}
+
+.fl {
+    float: left;
+}
+
+.wrap {
+    /* padding: 10px 5px; */
+    margin:20px
+}
+
+.wrap .box {
+    display: table;
+    width: 100%;
+    height: auto;
+}
+
+.wrap input[type=text] {
+    width: 100%;
+    border: 1px solid #ddd;
+    height: 35px;
+    outline: none;
+    padding-left: 10px;
+    margin: 5px 0;
+}
+
+.sex {
+    margin: 0 10px;
+    display: inline-block;
+}
+
+.sex input[type=radio] {
+    display: none;
+}
+
+.sex label {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2e907c;
+}
+
+.sex label i {
+    display: inline-block;
+    width: 5px;
+    height: 2px;
+    margin-top:11px;
+    margin-left: 4px;
+    background: #fff;
+    line-height: 0;
+    font-size: 0;
+    vertical-align: middle;
+    -webkit-transform: rotate(45deg);
+    position: relative;
+    opacity: 0;
+}
+
+.sex label i:after {
+    content: '/';
+    display: block;
+    width: 10px;
+    height: 2px;
+    background: #fff;
+    -webkit-transform: rotate(-90deg) translateY(-50%) translateX(50%);
+    position: absolute;
+    left: 1px;
+}
+
+.ml10 {
+    margin-left: 10px;
+}
+
+.mr10 {
+    margin-right: 10px;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
+.s:checked + i {
+    opacity: 1;
+}
+
+.box{
+	margin-top: 5px;
+	
+}
+.box select {
+    display: block;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid #ddd;
+    width: 100%;
+    height: 35px;
+    outline: none;
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+.submit {
+   /*  width: 180px; */
+    width:100%;
+    height: 50px;
+    background: #2e907c;
+    border-radius: 5px;
+    color: #fff;
+    margin: 15px auto;
+    display: block;
+    text-align: center;
+    font-size: 18px;
+    border: none;
+    font-size:20px;
+}
+
+.sendsms {
+	font-size:14px;
+    width: 37%;
+    height: 35px;
+    background: #2e907c;
+    border-radius: 5px;
+    color: #fff;
+    margin: 0 auto;
+    display: inline-block;
+    text-align: center;
+    border: none;
+
+}
+
+
+/* 预约付款 */
+
+.cell {
+    width: 100%;
+    overflow:hidden;
+    padding: 15px 10px;
+    font-size: .14rem;
+}
+}
+
+.cell p {
+    min-height: 35px;
+    line-height: 35px;
+    padding: 0 2%;
+    display: inline-block;
+}
+
+.cell div:first-child {
+    border-right:1px solid #000;
+    width: 1rem;
+}
+.cell div:nth-child(2) {
+    padding-left:10px;
+  
+}
+
+.cell a {
+    display: block;
+    width: 150px;
+    height: 40px;
+    background: #2e907c;
+    margin: 15px auto;
+    color: #fff;
+    font-size: 20px;
+    line-height: 40px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 10px;
+}
+.cell div {
+	
+    float: left;
+}
+
+/*  预约接种 */
+
+.c-flex{
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+}
+
+.c-flex-1{
+	-webkit-box-flex:1;
+	    -ms-flex:1;
+	        flex:1;
+}
+.baby-list{
+	width: 100%;
+	height: 110px;
+	padding: 0 10px;
+	border-bottom: 1px solid #ddd;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+}
+
+.baby-img{
+	width: 100px;
+}
+
+.baby-img img{
+	width: 100%;
+	height: auto;
+	margin-right: 10px;
+}
+
+.baby-next{
+	width: 16px;
+	height: 30px;
+	background: url(../img/next.png) no-repeat;
+	background-size: cover;
+	margin-top: 30px;
+}
+
+
+.baby-con{
+	padding: 0 10px;
+}
+
+.baby-con h3{
+	line-height: 40px;
+}
+
+
+.baby-attention{
+	width: 100%;
+	text-align: center;
+	margin-top: 70px;
+	position: relative;
+	line-height: 40px;
+	font-size: 16px;
+}
+
+.baby-attention:after{
+	content: "";
+	display: block;
+	width: 50px;
+	height: 10px;
+	background: #2e907c;
+	position: absolute;
+	top: -30px;
+	left: 50%;
+	margin-left: -25px;
+}
+.baby-attention:before{
+	content: "";
+	display: block;
+	width: 10px;
+	height: 50px;
+	background: #2e907c;
+	position: absolute;
+	top: -50px;
+	left: 50%;
+	margin-left:-5px;
+}
+
+/* 选择疫苗 */
+
+.box-vaccination{
+	width: 100%;
+	height: 40px;
+	border-bottom: 1px solid #ddd;
+	line-height: 40px;
+	position: relative;
+	padding: 0 15px;
+}
+
+.box-vaccination span{
+	margin-right: 15px;
+}
+
+
+.box-vaccination label{
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background: #2e907c;
+	position: absolute;
+	left: 120px;
+	top: 12px;
+	
+}
+
+.box-vaccination label i{ 
+	display: inline-block; 
+	width:5px;
+	height:2px;  
+	background: #fff;
+	line-height: 0;
+	font-size:0;
+	vertical-align: middle;
+	-webkit-transform: rotate(45deg);
+	position: relative;
+	opacity: 0;
+	margin-top: -25px;
+	margin-left: 3px;
+}
+.box-vaccination label i:after{
+	content:'/';
+	display:block;
+	width: 8px;
+	height:2px; 
+	background: #fff;
+	-webkit-transform: rotate(-90deg) translateY(-50%) translateX(50%);
+	position: absolute;
+	left:1px;
+}
+
+
+.s:checked + i{
+	opacity: 1;
+}
+
+.box-vaccination input[type=radio]{
+	display: none;
+}
+
+
+
+.box-vaccination.p2 label{
+	background: none;
+	border: 1px solid #2e907c;
+	position: relative;
+	left: 0;
+	top: 2px;
+}
+
+.box-vaccination.p2 label i{
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: #2e907c;
+	opacity: 1;
+	margin:0;
+	position: absolute;
+	left: 2px;
+	top: 2px;
+}
+.box-vaccination.p2 label i:after{
+	display: none;
+}
+
+.box-vaccination.p2 span a{
+	color: #2e907c;
+}
+
+.box-vaccination .total{
+	font-size: 16px;
+	color: #f00;
+}
+.box-wrap{
+	width: 100%;
+	display: table;
+	padding:30px;
+}
+
+.box-wrap button{
+	display: block;
+	width: 100px;
+	height: 41px;
+	background: url(../img/btn_select.png) no-repeat;
+	float: left;
+	border: none;
+}
+.box-wrap a{
+	display: block;
+	width: 100px;
+	height: 41px;
+	background: url(../img/btn_return.png) no-repeat;
+	float: right;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

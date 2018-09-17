@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.NotificationMapper">
+
+	<sql id="sysHolidayColumns">
+		a.id AS "id",
+		a.childcode AS "childcode",
+		a.notifyname AS "notifyname",
+		a.notifytime AS "notifytime",
+		a.notifycontent AS "notifycontent",
+		a.type AS "type",
+		a.CHILDID AS "CHILDID"
+	</sql>
+
+
+
+	<select id="findByChildcode" resultType="Notification">
+		SELECT
+		 	<include refid="sysHolidayColumns"/>
+		  FROM  VAC_NOTIFICATION a
+		WHERE  a.childcode= #{value}
+		ORDER BY a.CREATE_DATE DESC
+	</select>
+
+	<select id="findByMessage" resultType="PromotMessage">
+		SELECT id,title,link,image,description, content  FROM  CMS_PROMOTEMESSAGE
+	</select>
+	<select id="findById" resultType="PromotMessage">
+		SELECT id,title,link,image,description, content  FROM  CMS_PROMOTEMESSAGE WHERE id=#{value}
+	</select>
+
+	<insert id="insertNotification">
+		<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT sys_guid() FROM DUAL
+		</selectKey>
+		insert into VAC_NOTIFICATION (
+		ID,
+		CHILDCODE,
+		NOTIFYNAME,
+		NOTIFYTIME,
+		NOTIFYCONTENT,
+		"TYPE",
+		CREATE_DATE,
+		CHILDID
+		)VALUES(
+		#{id},
+		#{childcode},
+		#{notifyname},
+		#{notifytime},
+		#{notifycontent},
+		#{type},
+		#{createDate},
+		#{childid}
+		)
+	</insert>
+
+	<!-- 消息中心-系统消息，edit by wangnan 2018-3-1 -->
+	<select id="findMessage" resultType="java.util.Map">
+		SELECT id,title,link,image,description  
+		FROM  CMS_PROMOTEMESSAGE
+	</select>
+
+	<!-- 消息中心-系统消息详情，edit by wangnan 2018-3-1 -->
+	<select id="getMessDetail" resultType="java.lang.String">
+		SELECT content  
+		FROM  CMS_PROMOTEMESSAGE
+		WHERE ID = #{id}
+	</select>
+
+
+</mapper>

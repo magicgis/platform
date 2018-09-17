@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.junl.wpwx.mapper.VacKnowledgeSicknessMapper">
+    
+	<sql id="vacKnowledgeSicknessColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.description AS "description",
+		a.infoid AS "infoid",
+	    a.img AS "img"
+	</sql>
+	
+	<sql id="vacKnowledgeSicknessJoins">
+	</sql>
+    
+	<select id="get" resultType="VacKnowledgeSickness">
+		SELECT 
+			<include refid="vacKnowledgeSicknessColumns"/>
+		FROM vac_knowledge_sickness a
+		<include refid="vacKnowledgeSicknessJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacKnowledgeSickness">
+		SELECT 
+			<include refid="vacKnowledgeSicknessColumns"/>
+		FROM vac_knowledge_sickness a
+		<include refid="vacKnowledgeSicknessJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY #{orderBy}
+		</if>
+		
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO vac_knowledge_sickness(
+			id,
+			name,
+			description,
+			infoid
+		) VALUES (
+			#{id},
+			#{name},
+			#{description},
+			#{infoid}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_knowledge_sickness SET 	
+			name = #{name},
+			description = #{description},
+			infoid = #{infoid}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM vac_knowledge_sickness
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 查询疫苗知识列表 edit by wangnan 2018-2-9 -->	
+	<select id="findSickList" resultType="java.util.Map">
+		SELECT ID,NAME,IMG 
+		FROM VAC_KNOWLEDGE_SICKNESS 
+		ORDER BY ID
+
+	</select>
+	
+	<!-- 查询疫苗知识详情 edit by wangnan 2018-2-9 -->	
+	<select id="getSickDetail" resultType="java.lang.String">
+		SELECT DESCRIPTION
+		FROM VAC_KNOWLEDGE_SICKNESS 
+		WHERE ID=#{ID}
+
+	</select>
+	
+	
+	
+</mapper>

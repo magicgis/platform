@@ -1,0 +1,493 @@
+/*
+ * 閸忣剛鏁ら惃鍒s--reset
+ * @author 閺傝顒�
+ * @time 2016楠烇拷12閺堬拷14閺冿拷14:10:41;
+ * 
+ */
+
+
+/* --Elements-- */
+
+body,
+dd,
+div,
+dl,
+dt,
+fieldset,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+img,
+input,
+label,
+li,
+ol,
+p,
+pre,
+td,
+textarea,
+th,
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: calc(100vw/3.75);
+}
+
+img {
+	float: none;
+	border: none;
+}
+
+fieldset {
+	border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+	font-weight: 400;
+	font-style: normal;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+dd,
+dt,
+li {
+	position: relative;
+}
+
+caption,
+th {
+	text-align: center;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: 400;
+	font-size: 100%;
+}
+
+body {
+	word-break: break-all;
+	font: 12px/1.42857143 "Microsoft Yahei", 瀵邦喛钂嬮梿鍛寸拨, Verdana, Arial, Helvetica, sans-serif, 鐎瑰缍�;
+}
+
+input,
+select {
+	vertical-align: middle;
+	border-radius: 0!important; font-size: .14rem;
+}
+
+input[type="text"],
+textarea {
+	-webkit-appearance: none;
+}
+
+label {
+	cursor: hand;
+}
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+textarea {
+	outline: none;
+	resize: none;
+}
+
+
+/* --Reset-- */
+
+.tcenter {
+	text-align: center;
+}
+
+.tright {
+	text-align: right;
+}
+
+.tleft {
+	text-align: left;
+}
+
+.vtop {
+	vertical-align: top;
+}
+
+.vmiddle {
+	vertical-align: middle;
+}
+
+.vbottom {
+	vertical-align: bottom;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+.center {
+	margin: 0 auto;
+}
+
+.hide {
+	display: none;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+
+/* 濞撳懘娅庡ù顔煎З */
+
+.clear {
+	clear: both;
+	overflow: hidden;
+	height: 0;
+}
+
+
+/* 閸ф濮搁崗鍐濮樻潙閽╃仦鍛厬 */
+
+.auto {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+
+/*娴犲懘妾烘禍宸宔濞撳懘娅庡ù顔煎З*/
+
+.fix {
+	zoom: 1;
+}
+
+.fix:after {
+	display: block;
+	visibility: hidden;
+	clear: both;
+	overflow: hidden;
+	height: 0;
+	content: "clear";
+}
+
+
+/* 閸楁洝顢戦弬鍥х摟濠с垹鍤搹姘卞仯閺勫墽銇� */
+
+.ell {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+
+/* 閸樺娅巆hrome鐠侀缍囩�靛棛鐖滄潏鎾冲弳濡楀棜鍎楅弲顖濆娑撴椽绮嶉懝锟� */
+
+input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #FFF inset;
+}
+
+
+/* 閸樺娅巆hrome娑撳娈慽nput閽冩繆澹婃潏瑙勵攱 */
+
+input {
+	outline: 0
+}
+
+
+/* 閸樺娅嶪Einput x */
+
+::-ms-clear,
+::-ms-reveal {
+	display: none;
+}
+
+
+/* HTML5 display-role reset for older browsers */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+	display: block;
+}
+
+body {
+	line-height: 1;
+	/*鐟欙絽鍠卛phone 娑撳鍨悰銊︾泊閸斻劎绱﹂幈锟� */
+	-webkit-overflow-scrolling: touch;
+}
+
+.wrap {
+	margin: .2rem;
+	padding-top: 50px;
+}
+
+.mt10 {
+	margin-top: .1rem;
+}
+
+
+/*
+* @Author: wufang
+* @Date:   2018-02-26 14:53:50
+* @Last Modified by:   wufang
+* @Last Modified time: 2018-02-26 15:35:08
+*/
+
+.wrap .box {
+	display: table;
+	width: 100%;
+	height: auto;
+	font-size: .14rem;
+}
+
+.box p span {
+	background: url(../image/icon.png);
+	background-size: cover;
+	width: .1rem;
+	display: inline-block;
+	height: .1rem;
+}
+
+.box p label {
+	margin-left: 5px;
+	font-size: .16rem;
+	color: #231815;
+	font-weight: normal;
+}
+
+.sex-radio i {
+	display: block;
+	width: 20px;
+	height: 20px;
+	background: url(../image/radio_0.png) 0 0 no-repeat;
+	background-size: cover;
+	position: absolute;
+	top: 50%;
+    transform: translateY(-50%);
+}
+
+i.selected {
+	background: url(../image/radio_1.png) 0 0 no-repeat;
+	background-size: cover;
+}
+
+.sex-group label {
+	font-weight: normal;
+	margin-bottom: 0;
+	padding-left: 36px;
+	position: relative;
+	font-weight: normal;
+}
+
+.birthday,
+.gravida {
+	width: 48%;
+}
+
+.box p {
+	margin-bottom: 5px;
+}
+
+select {
+	height: 40px!important;
+	background: #fff!important;
+	border: 1px solid #ddd!important;
+}
+
+
+/*#birthday,#weight,#babyCardId,#reaction,#babyName,#motherPhoneNum,#motherIdCard {
+	background: #f2f2f2;
+	border:0!important;
+}*/
+
+.inputBg {
+	background: #fff!important;
+	border: 1px solid #ddd!important;
+}
+
+.info-submit {
+	width: 100%;
+    /* height: 40px; */
+    background: #68c4c8;
+    border-radius: 5px;
+    color: #fff;
+    margin: 5px auto;
+    display: block;
+    text-align: center;
+    border: none;
+    font-size: .16rem;
+    padding: 10px 0;
+}
+
+.backChildInfo,
+.backcustodianInfo {
+	width: 30%;
+	/* height: 50px; */
+	background: #7fcbe4;
+	border-radius: 5px;
+	color: #fff;
+	margin: 5px auto;
+	display: block;
+	text-align: center;
+	border: none;
+	font-size: .16rem;
+    padding: 10px 0;
+}
+
+.info-next {
+	width: 50%;
+	/* height: 50px; */
+	background: #68c4c8;
+	border-radius: 5px;
+	color: #fff;
+	margin: 5px auto;
+	display: block;
+	text-align: center;
+	font-size: .16rem;
+    padding: 10px 0;
+}
+
+.ml0 {
+	margin-left: 0!important;
+}
+
+.address-box select {
+	width: 32%!important;
+	float: left;
+	border: none;
+}
+
+input:focus {
+	border: 1px solid #3dc0c3!important
+}
+
+body>.mui-progressbar {
+	position: fixed!important;
+	top: auto!important;
+	bottom: 0!important;
+	height: 4px;
+}
+
+.mui-progressbar span {
+	background: #68c4c8!important;
+}
+
+input {
+	font-size: .14rem!important;
+}
+
+.progressbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    /* margin: 10px; */
+    padding: 10px 0;
+    z-index: 999;
+    background: #efeff4;
+    /*CSS counters to number the steps*/
+    counter-reset: step;
+    height:55px;
+}
+
+.progressbar li {
+    list-style-type: none;
+    color: #7b7171;
+    text-transform: uppercase;
+    font-size: .14rem;
+    width: 33.33%;
+    float: left;
+    position: relative;
+    text-align: center;
+}
+
+.progressbar li:before {
+    content: counter(step);
+    counter-increment: step;
+    width: 20px;
+    text-align: center;
+    line-height: 20px;
+    display: block;
+    /* font-size: 10px; */
+    color: #333;
+    background: white;
+    border-radius: 50%;
+    margin: 0 auto 5px auto;
+}
+
+
+/*progressbar connectors*/
+
+.progressbar li:after {
+    content: '';
+    width: 100%;
+    height: 6px;
+    background: #fff;
+    position: absolute;
+    left: -50%;
+    top: 7px;
+    z-index: -1;
+    /*put it behind the numbers*/
+}
+.active {
+	color:#68c4c8!important;
+}
+.progressbar li:first-child:after {
+    /*connector not needed before the first step*/
+    content: none;
+}
+
+
+/*marking active/completed steps green*/
+
+
+/*The number of the step and the connector before it = green*/
+
+.progressbar li.active:before,
+.progressbar li.active:after {
+    background: #68c4c8;
+    color: white;
+}
+
+.progressbar-rabies li,.progressbar-hbs li {
+	width:50%!important;
+}
+
+.layui-layer-msg{
+	top:1.5rem!important;
+}

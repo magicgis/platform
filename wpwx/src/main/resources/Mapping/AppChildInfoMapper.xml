@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.AppChildInfoMapper">
+    
+	<sql id="appUser">
+        A . ID AS "id",
+        A .nickname AS "nickname",
+        A .phone AS "phone",
+        A .registrationid AS "registrationid",
+        A ."UID" AS "uid",
+        A .userpwd AS "userpwd",
+        A .name AS "realname",
+        A .create_date AS "createDate",
+        A .update_date AS "updateDate",
+        A .remarks AS "remarks",
+        A .headurl AS "headurl"
+
+	</sql>
+	<sql id="childAppinfo">
+		a.id AS "id",
+		a.childcode AS "childcode",
+		a.childname AS "childname",
+		a.birthday AS "birthday",
+		a.guardianname AS "guardianname",
+		a.guardianrelation AS "guardianrelation",
+		a.phone AS "phone",
+		a.userid AS "userid",
+		 a .create_date AS "createDate",
+        a .update_date AS "updateDate",
+		a.remarks AS "remarks"
+	</sql>
+    <!--VAC_APP_USER    vac_child_appinfo-->
+
+    <select id="findList" resultType="ChildAppinfo">
+        SELECT
+        <include refid="childAppinfo"/>
+        FROM vac_child_appinfo a
+        <where>
+            <if test="childcode != null and childcode != ''">
+                AND a.childcode =#{childcode}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND a.PHONE =#{phone}
+            </if>
+        </where>
+    </select>
+
+
+	<select id="get" resultType="ChildAppinfo">
+        SELECT
+			<include refid="childAppinfo"/>
+		FROM vac_child_appinfo a
+		      WHERE a.id = #{id}
+	</select>
+
+    <insert id="insert">
+        <selectKey resultType="String" keyProperty="id" order="BEFORE">
+            SELECT sys_guid() FROM DUAL
+        </selectKey>
+        INSERT INTO vac_child_appinfo(
+        id,
+        childcode,
+        childname,
+        birthday,
+        guardianname,
+        guardianrelation,
+        phone,
+        userid,
+        create_date,
+        remarks
+        ) VALUES (
+        #{id},
+        #{childcode},
+        #{childname},
+        #{birthday},
+        #{guardianname},
+        #{guardianrelation},
+        #{phone},
+        #{userid},
+        sysdate,
+        #{remarks}
+        )
+    </insert>
+
+   <select id="findByPhone" resultType="AppUser">
+        SELECT
+        <include refid="appUser"/>
+           FROM VAC_APP_USER a
+        WHERE a."PHONE" = #{value}
+    </select>
+
+ 	<select id="findByUid" resultType="AppUser">
+        SELECT
+        <include refid="appUser"/>
+          FROM VAC_APP_USER a
+        WHERE a."UID" = #{value}
+    </select>
+    
+    <select id="findByList" resultType="AppUser">
+        SELECT
+        <include refid="appUser"/>
+          FROM VAC_APP_USER a
+        <where>
+            <if test="phone != null and phone != ''">
+                AND a."PHONE"  = #{phone}
+            </if>
+            <if test="uid != null and uid != ''">
+                AND a."UID" = #{uid}
+            </if>
+            <if test="type != null and type != ''">
+                AND a."TYPE" = #{type}
+            </if>
+        </where>
+    </select>
+
+    <!-- 手机号码查询关注儿童列表 -->
+    <select id="getByPhone" resultType="BsChildBaseInfo">
+        SELECT t.* FROM BS_CHILD_BASEINFO T
+        RIGHT JOIN vac_child_appinfo b ON b.childcode = T .childcode
+        WHERE  b."PHONE"  = #{value}
+    </select>
+
+    <insert id="insertByApp">
+        INSERT INTO VAC_APP_USER(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            USERPWD
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{userpwd}
+        )
+    </insert>
+
+    <insert id="insertByUid">
+        INSERT INTO VAC_APP_USER(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            "UID",
+            "TYPE"
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{uid},
+            #{type}
+        )
+    </insert>
+
+
+
+    <update id="updateByApp">
+        UPDATE VAC_APP_USER
+        <set>
+            <if test="registrationid != null">
+                REGISTRATIONID  = #{registrationid},
+            </if>
+            <if test="userpwd != null">
+                USERPWD= #{userpwd},
+            </if>
+            <if test="headurl != null">
+                HEADURL =#{headurl},
+            </if>
+            <if test="nickname != null">
+                NICKNAME =#{nickname},
+            </if>
+            <if test="uid != null">
+                "UID" = #{uid},
+            </if>
+            <if test="type != null">
+                "TYPE" = #{type},
+            </if>
+        </set>
+        WHERE phone = #{phone}
+    </update>
+
+<!--    <update id="updateByApp">
+        UPDATE VAC_APP_USER SET
+        REGISTRATIONID = #{registrationid},
+        USERPWD= #{userpwd}
+        WHERE phone = #{phone}
+    </update>
+
+    <update id="updateByHeadpath">
+        UPDATE VAC_APP_USER SET
+         HEADURL =#{headurl}
+        WHERE phone = #{phone}
+    </update>
+    <update id="updateByPwd">
+        UPDATE VAC_APP_USER SET
+        USERPWD =#{userpwd}
+        WHERE phone = #{phone}
+    </update>
+
+    <update id="updateByNickname">
+        UPDATE VAC_APP_USER SET
+        NICKNAME =#{nickname}
+        WHERE phone = #{phone}
+    </update>-->
+    <update id="updateByid">
+        UPDATE VAC_APP_USER SET
+        REGISTRATIONID = #{registrationid},
+        "UID" = #{uid},
+         "TYPE"=#{type}
+        WHERE id = #{id}
+    </update>
+
+
+	<!-- 2018-2-1 根据手机号查询用户密码 -->
+ 	<select id="getPwdByPhone" resultType="java.lang.String">
+        SELECT
+        	PASSWORD
+           FROM VAC_USER_LIST a
+        WHERE a.PHONE = #{value}
+    </select>
+    
+    <!-- 2018-2-1 wangnan 测试使用 -->
+    <update id="updateByregisId_1">
+        UPDATE VAC_USER_LIST SET
+        REGISTRATIONID = #{registrationid}
+        WHERE phone = #{phone}
+    </update>
+    
+    <!-- 手机号码查询关注儿童列表 2018-2-1 wangnan 测试使用 -->
+    <select id="getByPhone_1" resultType="java.lang.Integer">
+        SELECT count(*) FROM BS_CHILD_BASEINFO T
+        INNER JOIN vac_child_baseinfo b ON T.childcode = b.childcode
+        WHERE  b.PHONE  = #{value}
+    </select>
+    
+    <!-- 2018-2-1 根据手机号查询MARK,UNIONID -->
+ 	<select id="getInfoByPhone" resultType="java.util.Map">
+        SELECT 
+        	 A.MARK AS MARK,A.UNIONID AS UNIONID
+           FROM VAC_USER_LIST A
+        WHERE A.PHONE = #{value}
+    </select>
+        
+    <select id="getInfoByUID" resultType="java.util.Map">
+        SELECT 
+        	 A.PHONE AS PHONE,A.MARK AS MARK,A.UNIONID AS UNIONID
+           FROM VAC_USER_LIST A
+        WHERE A.UNIONID = #{uid}
+    </select>
+    
+    <!-- 2018-2-1 通过手机号获取OPENID -->
+ 	<select id="getOpenIDByPhone" resultType="java.lang.String">
+        SELECT
+        	a.OPENID
+           FROM VAC_USER_LIST a
+        WHERE a.PHONE = #{value}
+    </select>
+    
+    
+     <!-- 2018-2-1 通过openID获取手机号 -->
+ 	<select id="getPhoneByOpenID" resultType="java.lang.String">
+        SELECT
+        	a.PHONE
+           FROM VAC_USER_LIST a
+        WHERE a.OPENID = #{value}
+    </select>
+    
+    <!-- 2018-2-5 通过UID_WX获取手机号 -->
+    <select id="getPhoneByUID_WX" resultType="java.lang.String">
+        SELECT
+        	a.PHONE
+           FROM VAC_USER_LIST a
+        WHERE a.UID_WX = #{value}
+    </select>
+    
+    <!-- 2018-2-5 通过UID_QQ获取手机号 -->
+    <select id="getPhoneByUID_QQ" resultType="java.lang.String">
+        SELECT
+        	a.PHONE
+           FROM VAC_USER_LIST a
+        WHERE a.UID_QQ = #{value}
+    </select>
+    
+    <!-- 2018-2-5 通过UID_WB获取手机号 -->
+    <select id="getPhoneByUID_WB" resultType="java.lang.String">
+        SELECT
+        	a.PHONE
+           FROM VAC_USER_LIST a
+        WHERE a.UID_WB = #{value}
+    </select>
+    
+    
+    <!-- 2018-2-1 通过手机号获取OPENID -->
+ 	<select id="getIDByPhone" resultType="java.util.Map">
+        SELECT
+        	a.ID AS ID,a.PHONE AS PHONE
+           FROM VAC_USER_LIST a
+        WHERE a.PHONE = #{value}
+    </select>
+    
+    <!-- 2018-2-6 用户是否存在 -->
+    <select id="getIsExistByPhone" resultType="java.lang.Integer">
+        SELECT
+        	count(*)
+           FROM VAC_USER_LIST a
+        WHERE a.PHONE = #{value}
+    </select>
+    <!--app_user    vac_child_appinfo-->
+    
+    <!-- 2018-2-6 插入用户信息 -->
+    <insert id="insertUserByApp">
+        INSERT INTO VAC_USER_LIST(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            PASSWORD
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{userpwd}
+        )
+    </insert>
+    
+     <!-- 2018-2-6 APP密码找回  edit by wangnan 2018-2-6 -->
+    <update id="updateUserByPhone">
+        UPDATE VAC_USER_LIST SET
+        PASSWORD =#{userpwd},
+        REGISTRATIONID = #{registrationid}
+        WHERE phone = #{phone}
+    </update>
+    
+     <!-- 查询关注儿童列表 edit  by wangnan 2018-2-7 -->
+   <select id="getChildByID" resultType="java.util.Map">
+   <!-- 此ID为档案表中的ID,用于档案详情，, b."ID" AS VID,VID用于预约使用 -->
+        SELECT T."ID" AS ID,T.CHILDCODE AS CHILDCODE,T.CHILDNAME AS CHILDNAME ,
+        	TO_CHAR(T.BIRTHDAY,'yyyy-mm-dd') AS BIRTHDAY
+		FROM
+			BS_CHILD_BASEINFO T
+ 		INNER JOIN VAC_CHILD_BASEINFO b ON b.CHILDCODE = T .CHILDCODE 
+		INNER JOIN VAC_USER_LIST D ON  D.PHONE = b.PHONE and D ."ID" = #{value}
+        ORDER BY BIRTHDAY
+    </select>
+        
+	
+	<!-- 查询手机号码  关注宝宝 测试使用-->
+    <select id="choosephone_1" resultType="java.util.Map">
+		SELECT
+			"GUARDIANMOBILE" AS "MOTHERPHONE", "FATHERPHONE" AS "FATHERPHONE"
+		FROM
+			BS_CHILD_BASEINFO
+		WHERE 
+		
+			to_char("BIRTHDAY",'yyyy-mm-dd') = #{birth}
+			AND "CHILDNAME" = #{name} 
+
+	</select>
+	
+	
+	 <!-- 2018-2-7 插入第三方微信用户信息 -->
+    <insert id="insertUserByAppWX">
+        INSERT INTO VAC_USER_LIST(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            PASSWORD,
+            UID_WX
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{userpwd},
+            #{uid}
+        )
+    </insert>
+    
+     <!-- 2018-2-6 插入第三方QQ用户信息 -->
+    <insert id="insertUserByAppQQ">
+        INSERT INTO VAC_USER_LIST(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            PASSWORD,
+            UID_QQ
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{userpwd},
+            #{uid}
+        )
+    </insert>
+    
+     <!-- 2018-2-6 插入第三方微博用户信息 -->
+    <insert id="insertUserByAppWB">
+        INSERT INTO VAC_USER_LIST(
+            ID,
+            PHONE,
+            REGISTRATIONID,
+            PASSWORD,
+            UID_WB
+        ) VALUES (
+            #{id},
+            #{phone},
+            #{registrationid},
+            #{userpwd},
+            #{uid}
+        )
+    </insert>
+    
+    <!-- 2018-2-6 用户是否存在 -->
+    <select id="getIsAtten" resultType="java.lang.Integer">
+        SELECT 
+        	COUNT (*)
+		FROM 
+			VAC_CHILD_BASEINFO 
+		WHERE 
+			to_char(BIRTHDAY,'yyyy-mm-dd') = #{birth} 
+ 			AND CHILDNAME = #{name} 
+ 			AND PHONE = (SELECT PHONE FROM VAC_USER_LIST  where ID = #{userId})
+       
+    </select>
+    
+    
+    <select id="getChildBaseInfo" resultType="java.util.Map">
+         SELECT 
+         	CHILDCODE,CARDCODE,BIRTHCODE,GUARDIANNAME
+      		<!-- CHILDCODE,CHILDNAME,CARDCODE,BIRTHCODE,BIRTHDAY,GUARDIANNAME -->
+		FROM 
+			BS_CHILD_BASEINFO 
+		WHERE 
+			to_char(BIRTHDAY,'yyyy-mm-dd') = #{birth}  
+ 			AND CHILDNAME = #{name}
+ 			AND (GUARDIANMOBILE = #{mobile} OR FATHERPHONE=#{mobile})
+ 			
+    </select>
+    
+    
+    <!-- 2018-2-8 获取手机号  -->
+ 	<select id="getPhoneByID" resultType="java.lang.String">
+        SELECT
+        	PHONE
+           FROM VAC_USER_LIST 
+        WHERE ID = #{userId}
+    </select>
+    
+     <!-- 2018-2-6 插入第三方微博用户信息 -->
+    <insert id="insertChildInfo">
+        INSERT INTO VAC_CHILD_BASEINFO(
+            ID,
+            CHILDCODE,
+            CHILDNAME,
+            CARDCODE,
+            BIRTHCODE,
+            BIRTHDAY,
+            NAME,
+            PHONE,
+            CREATE_DATE
+        ) VALUES (
+            #{ID},
+            #{CHILDCODE},
+            #{CHILDNAME},
+            #{CARDCODE},
+            #{BIRTHCODE},
+            to_date(#{BIRTHDAY} , 'yyyy-mm-dd hh24:mi:ss'),
+            #{GUARDIANNAME},
+            #{mobile},
+            #{createtime}
+            
+        )
+    </insert>
+    
+    
+     <!-- 查询关注儿童档案信息  edit  by wangnan 2018-2-24 -->
+   <select id="getChildInfoByID" resultType="java.util.Map">
+        SELECT
+			CHILDCODE,CHILDNAME,
+			CARDCODE,BIRTHCODE,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY,	
+			(select A.LABEL from SYS_DICT A where A.TYPE='sex' and A.VALUE=B.GENDER ) AS SEX,
+			CHILDORDER,
+			(select A.LABEL from SYS_DICT A where A.TYPE='nation' and A.VALUE=B.NATION ) AS NATION,
+			BIRTHWEIGHT,
+			GUARDIANNAME,
+			GUARDIANMOBILE,
+			GUARDIANIDENTIFICATIONNUMBER AS GUARDIANCARDCODE ,
+			FATHER AS FATHERNAME,FATHERPHONE,FATHERCARD AS FATHERCARDCODE,
+			(select A.LABEL from SYS_DICT A where A.TYPE='properties' and A.VALUE=B.PROPERTIES ) AS PROPERTIES,
+			(select A.LABEL from SYS_DICT A where A.TYPE='reside' and A.VALUE=B.RESIDE ) AS RESIDE,
+			(select A.NAME from SYS_BIRTH_HOSPITAL A where A.CODE = B.BIRTHHOSTIPAL ) AS BIRTHHOSTIPAL,
+			<!-- ADDRESS AS HOMEADDRESS,
+			REGADDRESS  地址一开始不存在-->
+			<!-- HOMEADDRESS,
+			REGISTRYADDRESS -->
+			(select A.NAME from SYS_AREA A where A.ID = B.PROVINCE )||(select A.NAME from SYS_AREA A where A.ID = B.CITY )||(select A.NAME from SYS_AREA A where A.ID = B.COUNTY )||ADDRESS AS	HOMEADDRESS,
+ 			(select A.NAME from SYS_AREA A where A.ID = B.PR )||(select A.NAME from SYS_AREA A where A.ID = B.CI )||(select A.NAME from SYS_AREA A where A.ID = B.CO )||REGADDRESS AS REGISTRYADDRESS 
+			
+		FROM
+			BS_CHILD_BASEINFO  B
+		WHERE B.ID = #{id}
+    </select>
+     
+    
+         <!-- 查询关注儿童档案信息， 通过childcode  edit  by wangnan 2018-3-2 -->
+   <select id="getChildInfoByCode" resultType="java.util.Map">
+        SELECT
+			CHILDCODE,CHILDNAME,
+			CARDCODE,BIRTHCODE,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY,	
+			(select A.LABEL from SYS_DICT A where A.TYPE='sex' and A.VALUE=B.GENDER ) AS SEX,
+			CHILDORDER,
+			(select A.LABEL from SYS_DICT A where A.TYPE='nation' and A.VALUE=B.NATION ) AS NATION,
+			BIRTHWEIGHT,
+			GUARDIANNAME,
+			GUARDIANMOBILE,
+			GUARDIANIDENTIFICATIONNUMBER AS GUARDIANCARDCODE ,
+			FATHER AS FATHERNAME,FATHERPHONE,FATHERCARD AS FATHERCARDCODE,
+			(select A.LABEL from SYS_DICT A where A.TYPE='properties' and A.VALUE=B.PROPERTIES ) AS PROPERTIES,
+			(select A.LABEL from SYS_DICT A where A.TYPE='reside' and A.VALUE=B.RESIDE ) AS RESIDE,
+			(select A.NAME from SYS_BIRTH_HOSPITAL A where A.CODE = B.BIRTHHOSTIPAL ) AS BIRTHHOSTIPAL,
+			<!-- ADDRESS AS HOMEADDRESS,
+			REGADDRESS  地址一开始不存在-->
+			<!-- HOMEADDRESS,
+			REGISTRYADDRESS -->
+			(select A.NAME from SYS_AREA A where A.ID = B.PROVINCE )||(select A.NAME from SYS_AREA A where A.ID = B.CITY )||(select A.NAME from SYS_AREA A where A.ID = B.COUNTY )||ADDRESS AS	HOMEADDRESS,
+ 			(select A.NAME from SYS_AREA A where A.ID = B.PR )||(select A.NAME from SYS_AREA A where A.ID = B.CI )||(select A.NAME from SYS_AREA A where A.ID = B.CO )||REGADDRESS AS REGISTRYADDRESS 
+			
+		FROM
+			BS_CHILD_BASEINFO  B
+		WHERE B.CHILDCODE = #{childcode}
+    </select>
+    
+    <!-- 我的界面-我的个人信息  edit by wangnan 2018-2-26   -->
+    <select id="getmyInfo" resultType="java.util.Map">
+    	SELECT
+			PHONE, IMAGEPATH,NICKNAME
+		FROM
+			VAC_USER_LIST 
+		WHERE
+			ID = #{userId}
+    
+    </select>
+    
+    <!-- 我的界面-保存用户信息  edit by wangnan 2018-2-26   -->
+    <update id="updateMyInfoByID">
+        UPDATE VAC_USER_LIST
+        <set>           
+            <if test="headurl != null">
+                IMAGEPATH =#{headurl},
+            </if>
+            <if test="nickname != null">
+                NICKNAME =#{nickname},
+            </if>
+            <if test="userpwd != null">
+                PASSWORD= #{userpwd},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+     <!-- 我的界面-修改密码  edit by wangnan 2018-2-26   -->     
+    <select id="findPasswordByID" resultType="java.lang.String">
+        SELECT 
+        	PASSWORD
+        FROM 
+        	VAC_USER_LIST 
+        WHERE 
+        	ID  = #{userId}
+
+    </select>
+    
+    <!-- 查询用户是否已经关注该宝宝 -手机号+儿童编号  edit by wangnan 2018-2-27   -->     
+   <select id="getIsAttenByPhone" resultType="java.lang.Integer">
+        SELECT 
+        	COUNT (*)
+		FROM 
+			VAC_CHILD_BASEINFO 
+		WHERE 			
+ 			PHONE = #{phone}
+ 			AND CHILDCODE = #{childcode} 
+       
+    </select>
+    
+     <!-- 获取id edit by wangnan 2018-3-5   -->     
+    <select id="getIDByChildcode" resultType="java.lang.String">
+        SELECT 
+        	ID
+        FROM 
+        	BS_CHILD_BASEINFO 
+        WHERE 
+        	CHILDCODE  = #{childcode}
+
+    </select>
+    
+      <!-- 查询关注儿童档案信息-预约记录使用改  edit  by wangnan 2018-3-5 -->
+   <select id="getChildDataByID" resultType="java.util.Map">
+        SELECT
+			CHILDCODE,
+			CHILDNAME,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY	
+			FROM
+			BS_CHILD_BASEINFO 
+		WHERE ID = #{id}
+    </select>
+    
+      <!-- 查询关注儿童档案信息-预约记录使用改  edit  by wangnan 2018-3-5 -->
+  	 <select id="getChildDataByCode" resultType="java.util.Map">
+        SELECT
+			CHILDCODE,
+			CHILDNAME,
+			TO_CHAR (BIRTHDAY, 'yyyy-mm-dd') BIRTHDAY	
+			FROM
+			BS_CHILD_BASEINFO 
+		WHERE CHILDCODE  = #{childcode}
+    </select>
+    
+</mapper>

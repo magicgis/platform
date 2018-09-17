@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.junl.wpwx.mapper.VacUserMapper">
+    
+	<sql id="vacUserColumns">
+		a.id AS "id",
+		a.nickname AS "nickname",
+		a.headpath AS "headpath",
+		a.bindmobile AS "bindmobile",
+		a.openid AS "openid",
+		a.realname AS "realname",
+		a.createdate AS "createdate"
+	</sql>
+	
+	<sql id="vacUserJoins">
+
+	</sql>
+    
+	<select id="get" resultType="VacUser">
+		SELECT 
+			<include refid="vacUserColumns"/>
+		FROM vac_user a
+		<include refid="vacUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VacUser">
+		SELECT 
+			<include refid="vacUserColumns"/>
+		FROM vac_user a
+		<include refid="vacUserJoins"/>
+		<where>
+			
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY #{orderBy}
+		</if>
+	</select>
+
+	<select id="findBY" resultType="VacUser">
+		SELECT
+		<include refid="vacUserColumns"/>
+		FROM vac_user a
+		<include refid="vacUserJoins"/>
+		<where>
+
+		</where>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY #{orderBy}
+		</if>
+	</select>
+
+	
+	
+	<insert id="insert">
+		 <selectKey resultType="String" keyProperty="id" order="BEFORE">  
+            SELECT sys_guid() FROM DUAL  
+   		 </selectKey> 
+		INSERT INTO vac_user(
+			id,
+			nickname,
+			headpath,
+			bindmobile,
+			openid,
+			realname,
+			createdate
+		) VALUES (
+			#{id},
+			#{nickname},
+			#{headpath},
+			#{bindmobile},
+			#{openid},
+			#{realname},
+			#{createdate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE vac_user SET 	
+			nickname = #{nickname},
+			headpath = #{headpath},
+			bindmobile = #{bindmobile},
+			openid = #{openid},
+			realname = #{realname},
+			createdate = #{createdate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM vac_user
+		WHERE id = #{id}
+	</update>
+	
+	<select id="queryObject" resultType="VacUser">
+		SELECT 
+			<include refid="vacUserColumns"/>
+		FROM vac_user a
+		<include refid="vacUserJoins"/>
+		<where>
+			<if test="openId != null and openId != ''">
+				a.openId = #{openId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getOpenidByChildcode" resultType="java.lang.String">
+		SELECT
+			U .OPENID
+		FROM
+			VAC_CHILD_INFO i
+		LEFT JOIN VAC_USER U ON i.USERID = U ."ID"
+		WHERE
+			i.CHILDCODE = #{value}
+	</select>
+	<select id="findByPhone" resultType="java.lang.String">
+		SELECT
+		i.*
+		FROM
+		VAC_CHILD_INFO i
+		LEFT JOIN VAC_USER U ON i.USERID = U ."ID"
+		WHERE
+		i.CHILDCODE = #{value}
+	</select>
+
+<!--	<select id="getIdByChildcode" resultType="java.lang.String">
+		SELECT
+			U.REGISTRATIONID
+		FROM
+		VAC_CHILD_APPINFO i
+		LEFT JOIN VAC_APP_USER U ON i.PHONE = U.PHONE
+		WHERE
+		i.CHILDCODE = #{value}
+	</select>-->
+
+	<select id="getIdByChildcode" resultType="java.lang.String">
+		SELECT
+		U.REGISTRATIONID
+		FROM
+		VAC_CHILD_BASEINFO i
+		LEFT JOIN VAC_USER_LIST U ON i.PHONE = U.PHONE
+		WHERE
+		i.CHILDCODE = #{value}
+	</select>
+
+
+
+</mapper>
